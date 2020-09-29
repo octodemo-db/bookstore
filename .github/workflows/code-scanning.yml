@@ -1,0 +1,30 @@
+name: Code scanning
+
+on:
+  push:
+
+jobs:
+  build:
+    name: Perform CodeQL Scanning
+    runs-on: ubuntu-20.04
+    
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Initialize CodeQL Scanning
+        uses: github/codeql-action/init@v1
+        with:
+          languages: java
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v1
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
+    

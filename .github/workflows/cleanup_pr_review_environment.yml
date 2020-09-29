@@ -1,0 +1,64 @@
+name: Cleanup PR Review Environment
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  clean:
+    name: Cleanup Review apps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Mark environments as inactive in GitHub
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            console.log(context.payload.pull_request.head.ref)
+
+            github.repos.listDeployments(
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: context.payload.pull_request.head.ref
+              }
+            ).then(deployments => {
+              const promises = [];
+
+              deployments.data.forEach(deployment => {
+                promises.push(github.repos.createDeploymentStatus({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    mediaType: {previews: ["flash-preview", "ant-man"]},
+                    deployment_id: deployment.id,
+                    state: 'inactive',
+                    description: 'Pull Request Merged, destroying review environment'
+                  })
+                );
+              });
+
+              return Promise.all(promises);
+            });
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.OCTODEMO_AZURE_CREDENTIALS }}
+
+      - name: Delete the Web Apps for the PR
+        env:
+          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
+          QUERY: ${{ format('[?tags.ref==''refs/heads/{0}''&&tags.type==''{1}'']', github.head_ref, 'review') }}
+        run: |
+          az webapp list --resource-group $RESOURCE_GROUP --query "$QUERY" > webapplist.json
+
+          echo "Existing Web Applications"
+          cat webapplist.json
+
+          WEBAPP_ID_LIST=$(jq -j '.[].id+" "' webapplist.json)
+          echo "WEBAPP_IS_LIST: $WEBAPP_ID_LIST"
+
+          echo "::debug::About to delete the following Azure Webapps : $WEBAPP_ID_LIST"
+          if [ ${#WEBAPP_ID_LIST[@]} -ne 0 ]; then az webapp delete --ids $WEBAPP_ID_LIST --keep-empty-plan; fi

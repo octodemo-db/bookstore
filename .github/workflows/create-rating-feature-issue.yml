@@ -1,0 +1,56 @@
+name: Create Rating Feature Issue
+on:
+  repository_dispatch:
+    types: [create-rating-feature-issue]
+
+jobs:
+  create:
+    name: Create issue
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Sources
+      uses: actions/checkout@v2
+
+    - name: Create Issue
+      id: create-issue
+      uses: JasonEtco/create-an-issue@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        filename: .github/rating-feature-issue.md
+
+    - name: Add Design Team Comment
+      uses: actions/github-script@v2
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const commentBody = `     
+          👋 Hey, I have worked this out and provided the assets in the repository by direct file upload. 
+          
+          Let me know if you want anything else, I think this image specifies everything you need. 
+          
+          ![](https://user-images.githubusercontent.com/1982588/84479857-ea579600-ac93-11ea-8877-56b02462cbc5.png)`
+          
+          github.issues.createComment({
+            issue_number: ${{ steps.create-issue.outputs.number }},
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: commentBody
+          })
+
+    - name: Add Product Owner Comment
+      uses: actions/github-script@v2
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const commentBody = `
+          👋 This is great. Scrum masters, can you check how much capacity you need to implement this. 
+          We can then decide which sprint we put it in. Let\'s get this in people 😄`
+
+          github.issues.createComment({
+            issue_number: ${{ steps.create-issue.outputs.number }},
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: commentBody
+          })

@@ -1,0 +1,81 @@
+name: Build, Test and Publish
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+# The name of the `Build (ubuntu 20.04, 1.8)` build is used as a required context inside the repository on protected
+#  branches configuration. Any changes to the OS or Java version will need to be reflected in repository settings.
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-20.04', 'windows-latest']
+        java: [ '1.8' ]
+
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v2
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+          java-package: jdk
+
+      # Utilize caching of the resolved plugins and dependencies from previous Maven builds to provide
+      # faster builds when dependencies have not changed.
+      - name: Cache Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          # Hash on the POM file as that would need to change to modify the dependencies or plugins in use
+          key: ${{ runner.os }}-${{ matrix.java }}-mvn-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.java }}-mvn
+
+      - name: Define Build Parameters
+        id: build_params
+        uses: actions/github-script@v2
+        with:
+          script: |
+            const scriptPath = require('path').resolve('./.github/workflows/scripts/build_parameters.js')
+              , buildParameters = require(scriptPath);
+            ;
+            buildParameters(context, core).injectBuildParameters();
+
+      - name: Build Test and Package
+        id: maven_build
+        run: mvn package -B -Dsha1="${{ steps.build_params.outputs.maven_sha1 }}" -Dchangelist="${{ steps.build_params.outputs.maven_changelist }}" -D"github.repository"="${{ steps.build_params.outputs.github_repository }}" -D"container.image.name"="${{ steps.build_params.outputs.github_repository_name }}" -D"container.image.registry"="docker.pkg.github.com"
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{matrix.os}}-${{matrix.java}}-${{github.sha}}.war
+          path: target/*.war
+          
+      - name: Publish Docker image
+        id: container_publish
+        if: matrix.os == 'ubuntu-20.04'
+        env:
+          REGISTRY_USERNAME: <token>
+          # This token will be replaced by temporary application token once support is added for GitHub Applications tokens for deploying to GPR
+          REGISTRY_PASSWORD: ${{ secrets.OCTODEMO_OCTODEMOBOT_GITHUB_REPO_AND_PACKAGES_TOKEN }}
+        run: |
+          echo $REGISTRY_PASSWORD | docker login ${{ steps.maven_build.outputs.container_registry }} -u $REGISTRY_USERNAME --password-stdin
+          docker push ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
+
+      - name: Publish Container as a Status
+        id: container_image_status
+        if: matrix.os == 'ubuntu-20.04'
+        uses: Sibz/github-status-action@v1
+        with:
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          state: success
+          context: Container Image Published
+          description: ${{ steps.maven_build.outputs.container_deployment_registry_tag }} ${{ steps.maven_build.outputs.container_registry }}

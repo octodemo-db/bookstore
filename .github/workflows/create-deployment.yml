@@ -1,0 +1,75 @@
+name: Deployment trigger by Label
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  deployment:
+    name: Create deployment
+    runs-on: ubuntu-latest
+    if: |
+      github.event.label.name == 'Deploy to Test' ||
+      github.event.label.name == 'Deploy to Staging' ||
+      github.event.label.name == 'Deploy to QA'
+
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v2
+
+      - name: Acknowledge Request Label from Pull Request
+        id: acknowledge_label
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const scriptPath = require('path').resolve('./.github/workflows/scripts/deployment_label_trigger.js');
+            const script = require(scriptPath);
+            await script({context, core, github});
+            
+      - name: Remove Label
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.removeLabel({
+              ...context.repo,
+              issue_number: context.issue.number,
+              name: '${{ github.event.label.name }}'
+            });
+
+      - name: Get temporary token for creating deployment
+        id: temp_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.OCTODEMOBOT_APPLICATION_ID_REPO_AUTOMATION }}
+          application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
+      
+      - name: Create Deployment
+        uses: actions/github-script@v2
+        env:
+          container_registry: ${{ steps.acknowledge_label.outputs.container_registry }}
+          container_image_tag: ${{ steps.acknowledge_label.outputs.container_image_tag }}
+        with:
+          github-token: ${{ steps.temp_token.outputs.token }}
+          script: |
+            const scriptPath = require('path').resolve('./.github/workflows/scripts/create_labeled_deployment.js');
+            const labelDeployment = require(scriptPath);
+
+            await labelDeployment(context,
+                                  github,
+                                  process.env.container_registry,
+                                  process.env.container_image_tag
+            );
+
+      - name: Report Failure
+        if: failure()
+        uses: actions/github-script@v2
+        with:
+          script: |
+            const commentBody = `Failure in _${context.payload.label.name.toLowerCase()}_, for more details see https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            
+            await github.issues.createComment({
+              ...context.repo,
+              issue_number: context.payload.number,
+              body: commentBody,
+            });
