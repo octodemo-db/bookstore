@@ -65,7 +65,7 @@ jobs:
         env:
           REGISTRY_USERNAME: <token>
           # This token will be replaced by temporary application token once support is added for GitHub Applications tokens for deploying to GPR
-          REGISTRY_PASSWORD: ${{ secrets.OCTODEMO_OCTODEMOBOT_GITHUB_REPO_AND_PACKAGES_TOKEN }}
+          REGISTRY_PASSWORD: ${{ secrets.OCTODEMOBOT_GHPR_TOKEN }}
         run: |
           echo $REGISTRY_PASSWORD | docker login ${{ steps.maven_build.outputs.container_registry }} -u $REGISTRY_USERNAME --password-stdin
           docker push ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
