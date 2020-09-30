@@ -67,7 +67,7 @@ jobs:
     needs: deploy_details
 
     env:
-      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/octodemo-db/bookstore:${{ needs.deploy_details.outputs.version }}
+      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/octodemo-db-bookstore:${{ needs.deploy_details.outputs.version }}
 
     steps:
       - name: Sign in to GitHub Container Registry
