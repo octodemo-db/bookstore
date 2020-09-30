@@ -67,7 +67,7 @@ jobs:
     needs: deploy_details
 
     outputs:
-      gcp_container_name: ${{ steps.deploy_to_gcp.outputs.gcp_container_name }}
+      gcp_container_name: octodemo-db-bookstore
 
     env:
       GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/octodemo-db-bookstore:${{ needs.deploy_details.outputs.version }}
@@ -99,7 +99,6 @@ jobs:
         run: |
           gcloud auth configure-docker
           docker push $GCR_CONTAINER_IMAGE
-          echo "::set-output name=gcp_container_name::octodemo-db-bookstore"
 
 
   deploy:
