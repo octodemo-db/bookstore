@@ -1,9 +1,9 @@
-name: Build, Test and Publish
+name:  Branch - Build, Test and Publish
 
 on:
   push:
     branches-ignore:
-      - master
+      - main
 
 # The name of the `Build (ubuntu 20.04, 1.8)` build is used as a required context inside the repository on protected
 #  branches configuration. Any changes to the OS or Java version will need to be reflected in repository settings.

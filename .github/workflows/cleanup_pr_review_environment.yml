@@ -1,4 +1,4 @@
-name: Cleanup PR Review Environment
+name: Tear down environments
 
 on:
   pull_request:
@@ -41,24 +41,3 @@ jobs:
 
               return Promise.all(promises);
             });
-
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.OCTODEMO_AZURE_CREDENTIALS }}
-
-      - name: Delete the Web Apps for the PR
-        env:
-          RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
-          QUERY: ${{ format('[?tags.ref==''refs/heads/{0}''&&tags.type==''{1}'']', github.head_ref, 'review') }}
-        run: |
-          az webapp list --resource-group $RESOURCE_GROUP --query "$QUERY" > webapplist.json
-
-          echo "Existing Web Applications"
-          cat webapplist.json
-
-          WEBAPP_ID_LIST=$(jq -j '.[].id+" "' webapplist.json)
-          echo "WEBAPP_IS_LIST: $WEBAPP_ID_LIST"
-
-          echo "::debug::About to delete the following Azure Webapps : $WEBAPP_ID_LIST"
-          if [ ${#WEBAPP_ID_LIST[@]} -ne 0 ]; then az webapp delete --ids $WEBAPP_ID_LIST --keep-empty-plan; fi

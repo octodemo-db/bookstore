@@ -1,9 +1,9 @@
-name: Deploy to Production
+name: Build and Deploy [Production]
 
 on:
   push:
     branches:
-      - master
+      - main
 
 # The name of the `Build (ubuntu 20.04, 1.8)` build is used as a required context inside the repository on protected
 #  branches configuration. Any changes to the OS or Java version will need to be reflected in repository settings.
@@ -34,9 +34,12 @@ jobs:
         with:
           path: ~/.m2/repository
           # Hash on the POM file as that would need to change to modify the dependencies or plugins in use
-          key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
+          key: mvn-${{ matrix.java }}-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-mvn
+            mvn-${{ matrix.java }}-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+            mvn-${{ matrix.java }}-${{ runner.os }}
+            mvn-${{ matrix.java }}
+            mvn-
 
       - name: Define Build Parameters
         id: build_params
@@ -55,26 +58,34 @@ jobs:
             -Dsha1="${{ steps.build_params.outputs.maven_sha1 }}" \
             -Dchangelist="${{ steps.build_params.outputs.maven_changelist }}" \
             -Dgithub.repository="${{ steps.build_params.outputs.github_repository }}" \
-            -Dcontainer.image.name="${{ steps.build_params.outputs.github_repository_name }}"
+            -Dcontainer.image.name="${{ steps.build_params.outputs.container_name }}"
+        shell: bash
 
-      - name: Publish Docker image
-        id: container_publish
-        env:
-          REGISTRY_USERNAME: <token>
-          # This token will be replaced by temporary application token once support is added for GitHub Applications tokens for deploying to GPR
-          REGISTRY_PASSWORD: ${{ secrets.OCTODEMO_OCTODEMOBOT_GITHUB_REPO_AND_PACKAGES_TOKEN }}
-        run: |
-          echo $REGISTRY_PASSWORD | docker login ${{ steps.maven_build.outputs.container_registry }} -u $REGISTRY_USERNAME --password-stdin
-          docker push ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
-          
-      - name: Publish Container as a Status
-        id: container_image_status
-        uses: Sibz/github-status-action@v1
-        with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
-          state: success
-          context: Container Image Published
-          description: ${{ steps.maven_build.outputs.container_deployment_registry_tag }} ${{ steps.maven_build.outputs.container_registry }}
+    #
+    # Publish the container if we successfully build under Linux
+    #
+    - name: Sign in to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.OCTODEMOBOT_GHPR_TOKEN }}
+        registry: ghcr.io
+    
+    - name: Publish Docker image
+      id: container_publish
+      run: |
+        docker push ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
+
+    - name: Publish Container as a Status
+      id: container_image_status
+      uses: Sibz/github-status-action@v1
+      with:
+        authToken: ${{ secrets.GITHUB_TOKEN }}
+        state: success
+        context: Container Image Published
+        description: ${{ steps.maven_build.outputs.container_deployment_registry_tag }} ${{ steps.maven_build.outputs.container_registry }}
+
+      
 
   deploy:
     name: Create Deployment

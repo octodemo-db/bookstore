@@ -1,0 +1,81 @@
+name: Deploy to Cloud
+
+on:
+  deployment
+
+jobs:
+  deploy:
+    name: Deploy to Environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract Deployment Details and Report Deployment in Progress
+        id: deployment_data
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const run = process.env.GITHUB_RUN_ID
+              , log_url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${run}`
+              ;
+
+            //TODO remove
+            console.log(JSON.stringify(context, null, 2));
+
+            const deployment = context.payload.deployment
+              , environment = deployment.environment
+              , deploymentPayload = JSON.parse(deployment.payload)
+              , containerRegistryUrl = `${deploymentPayload.container_registry}`
+              , containerImage = `${deploymentPayload.container_image}`
+              , deploymentRef = deploymentPayload.ref
+              ;
+
+            let webAppName = `${context.repo.repo}-${environment}`
+            //if (environment !== 'prod') {
+            //  webAppName += `-${deployment.id}`
+            //}
+
+            core.setOutput('container_registry_url', containerRegistryUrl);
+            core.setOutput('container_image', containerImage);
+            core.setOutput('webapp_name', webAppName);
+            core.setOutput('deployment_github_ref', deploymentRef);
+            core.setOutput('app_type', environment == 'prod' ? 'prod' : 'review');
+
+            github.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              mediaType: {
+                previews: ["flash-preview", "ant-man"]
+              },
+              deployment_id: context.payload.deployment.id,
+              state: 'in_progress',
+              description: 'Deployment from GitHub Actions started',
+              target_url: log_url,
+              log_url: log_url
+            })
+
+# TODO need to validate that the container image actually exists before we try to deploy the application!    
+
+      # - name: Report Success
+      #   uses: octokit/request-action@v1.x
+      #   with:
+      #     route: POST /repos/:owner/:repo/deployments/:deployment_id/statuses
+      #     deployment_id: ${{ github.event.deployment.id }}
+      #     environment: ${{ github.event.deployment.environment }}
+      #     description: "Deployed in ${{ github.event.deployment.environment }}"
+      #     state: "success"
+      #     environment_url: "https://"
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Report Failure
+      #   if: failure()
+      #   uses: octokit/request-action@v1.x
+      #   with:
+      #     route: POST /repos/:owner/:repo/deployments/:deployment_id/statuses
+      #     deployment_id: ${{ github.event.deployment.id }}
+      #     description: "Deploy failed for ${{ github.event.deployment.environment }}"
+      #     environment: ${{ github.event.deployment.environment }}
+      #     state: "failure"
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
