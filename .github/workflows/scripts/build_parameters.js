@@ -46,8 +46,8 @@ class BuildParameters {
         // with respect to the branch name and commit we are building from.
         //
         // We also need to append '-SNAPSHOT' to the end of the version number unless we are a release build, which
-        // in the context of the Maven POM here, is the master branch (as that automatically deploys to prod).
-        if (branchName === 'master') {
+        // in the context of the Maven POM here, is the main branch (as that automatically deploys to prod).
+        if (branchName === 'main') {
             core.setOutput('maven_changelist', '');
             core.setOutput('maven_sha1', `-${shortSha}`);
         } else {
