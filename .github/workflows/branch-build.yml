@@ -59,15 +59,21 @@ jobs:
           name: ${{matrix.os}}-${{matrix.java}}-${{github.sha}}.war
           path: target/*.war
           
+      #
+      # Publish the container if we successfully build under Linux
+      #
+      - name: Sign in to GitHub Container Registry
+        if: matrix.os == 'ubuntu-20.04'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.OCTODEMOBOT_GHPR_TOKEN }}
+          registry: ghcr.io
+      
       - name: Publish Docker image
         id: container_publish
         if: matrix.os == 'ubuntu-20.04'
-        env:
-          REGISTRY_USERNAME: <token>
-          # This token will be replaced by temporary application token once support is added for GitHub Applications tokens for deploying to GPR
-          REGISTRY_PASSWORD: ${{ secrets.OCTODEMOBOT_GHPR_TOKEN }}
         run: |
-          echo $REGISTRY_PASSWORD | docker login ${{ steps.maven_build.outputs.container_registry }} -u $REGISTRY_USERNAME --password-stdin
           docker push ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
 
       - name: Publish Container as a Status
