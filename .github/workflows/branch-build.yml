@@ -38,6 +38,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.java }}-mvn-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.java }}-mvn
+            ${{ runner.os }}
 
       - name: Define Build Parameters
         id: build_params
