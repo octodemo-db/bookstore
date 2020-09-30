@@ -67,7 +67,7 @@ jobs:
     needs: deploy_details
 
     env:
-      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/octodemo-db/bookstore:${{ needs.deploy_details.version }}
+      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/octodemo-db/bookstore:${{ needs.deploy_details.outputs.version }}
 
     steps:
       - name: Sign in to GitHub Container Registry
@@ -111,7 +111,7 @@ jobs:
     env:
       TF_VAR_ENVIRONMENT: ${{ github.event.deployment.environment }}
       TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT_ID }}
-      TF_VAR_container_tag: ${{ needs.deploy_details.version }}
+      TF_VAR_container_tag: ${{ needs.deploy_details.outputs.version }}
 
       # Directory that contains Terraform HCL to run
       TERRAFORM_WORKING_DIRECTORY: ./terraform
