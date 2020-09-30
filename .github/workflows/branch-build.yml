@@ -35,10 +35,12 @@ jobs:
         with:
           path: ~/.m2/repository
           # Hash on the POM file as that would need to change to modify the dependencies or plugins in use
-          key: ${{ runner.os }}-${{ matrix.java }}-mvn-${{ hashFiles('**/pom.xml') }}
+          key: mvn-${{ matrix.java }}-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.java }}-mvn
-            ${{ runner.os }}
+            mvn-${{ matrix.java }}-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+            mvn-${{ matrix.java }}-${{ runner.os }}
+            mvn-${{ matrix.java }}
+            mvn-
 
       - name: Define Build Parameters
         id: build_params
