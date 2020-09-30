@@ -224,7 +224,7 @@
                                 </goals>
                                 <configuration>
                                     <name>container.image.name.full</name>
-                                    <value>${container.image.registry}/${github.repository}/${container.image.name}</value>
+                                    <value>${container.image.registry}/${container.image.name}</value>
                                     <regex>\?</regex>
                                     <toLowerCase>true</toLowerCase>
                                     <failIfNoMatch>false</failIfNoMatch>
