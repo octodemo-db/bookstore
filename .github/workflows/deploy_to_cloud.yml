@@ -33,7 +33,7 @@ jobs:
               , containerRegistryUrl = `${deploymentPayload.container_registry}`
               , containerImage = `${deploymentPayload.container_image}`
               , deploymentRef = deploymentPayload.ref
-              , version = (containerImage.split[':']).pop()
+              , version = (containerImage.split(':')).pop()
               ;
 
             const webAppName = `${context.repo.repo}-${environment}`
