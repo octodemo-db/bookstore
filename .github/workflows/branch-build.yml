@@ -58,7 +58,7 @@ jobs:
           mvn package -B -Dsha1="${{ steps.build_params.outputs.maven_sha1 }}" \
             -Dchangelist="${{ steps.build_params.outputs.maven_changelist }}" \
             -D"github.repository"="${{ steps.build_params.outputs.github_repository }}" \
-            -D"container.image.name"="${{ steps.build_params.outputs.github_repository_name }}"
+            -D"container.image.name"="${{ steps.build_params.outputs.container_name }}"
         shell: bash 
 
       - name: Save artifacts
