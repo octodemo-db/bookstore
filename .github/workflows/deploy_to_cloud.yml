@@ -8,7 +8,7 @@ env:
 
 jobs:
   deploy_details:
-    name: Deploy to Cloud Environment
+    name: Define Deployment Details
 
     runs-on: ubuntu-20.04
 
@@ -66,8 +66,11 @@ jobs:
 
     needs: deploy_details
 
+    outputs:
+      gcp_container_name: ${{ steps.deploy_to_gcp.outputs.gcp_container_name }}
+
     env:
-      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/octodemo-db-bookstore:${{ needs.deploy_details.outputs.version }}
+      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }}:${{ needs.deploy_details.outputs.version }}
 
     steps:
       - name: Sign in to GitHub Container Registry
@@ -92,9 +95,12 @@ jobs:
           export_default_credentials: true
 
       - name: Deploy Container to Google Cloud Container Registry
+        id: deploy_to_gcp
         run: |
           gcloud auth configure-docker
           docker push $GCR_CONTAINER_IMAGE
+
+          echo "::set-output name=gcp_container_name::${{ github.repository }}"
 
 
   deploy:
@@ -111,6 +117,7 @@ jobs:
     env:
       TF_VAR_ENVIRONMENT: ${{ github.event.deployment.environment }}
       TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT_ID }}
+      TF_VAR_container_image: ${{ needs.copy_container.outputs.gcp_container_name }}
       TF_VAR_container_tag: ${{ needs.deploy_details.outputs.version }}
 
       # Directory that contains Terraform HCL to run
@@ -123,13 +130,13 @@ jobs:
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v1.2.0
         with:
-          terraform_version: 0.13.3
+          terraform_version: 0.13.4
           terraform_wrapper: true
 
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v0.1.0
         with:
-          terragrunt_version: 0.25.1
+          terragrunt_version: 0.25.2
 
       - name: Sign in to Google Cloud Platform
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@0.1.3

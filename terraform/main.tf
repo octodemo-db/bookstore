@@ -8,7 +8,7 @@ provider "google" {
 }
 
 module "gcp_cloudrun" {
-    source                  = "github.com/octodemo-db-gcp-cloudrun?ref=main"
+    source                  = "github.com/octodemo-db/gcp-cloudrun?ref=main"
 
     gcp_project             = var.gcp_project
     gcp_application_name    = "github-bookstore-${var.ENVIRONMENT}"
