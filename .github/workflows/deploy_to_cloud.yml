@@ -70,7 +70,8 @@ jobs:
       gcp_container_name: ${{ steps.deploy_to_gcp.outputs.gcp_container_name }}
 
     env:
-      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }}:${{ needs.deploy_details.outputs.version }}
+      GCR_CONTAINER_NAME: octodemo-db-bookstore
+      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.GCR_CONTANER_NAME }}:${{ needs.deploy_details.outputs.version }}
 
     steps:
       - name: Sign in to GitHub Container Registry
@@ -99,8 +100,7 @@ jobs:
         run: |
           gcloud auth configure-docker
           docker push $GCR_CONTAINER_IMAGE
-
-          echo "::set-output name=gcp_container_name::${{ github.repository }}"
+          echo "::set-output name=gcp_container_name::${{ env.GCR_CONTAINER_NAME }}"
 
 
   deploy:
