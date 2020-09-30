@@ -68,6 +68,7 @@ jobs:
 
     outputs:
       gcp_container_name: octodemo-db-bookstore
+      other_container_name: ${{ steps.publish.outputs.container_name }}
 
     env:
       GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/octodemo-db-bookstore:${{ needs.deploy_details.outputs.version }}
@@ -100,6 +101,13 @@ jobs:
           gcloud auth configure-docker
           docker push $GCR_CONTAINER_IMAGE
 
+      - name: Expose Output
+        id: publish
+        uses: actions/github-script@v2
+        with:
+          script: |
+            core.setOutput('container_name', 'octodemo-db-bookstore');
+
 
   deploy:
     name: Terraform Deploy
@@ -116,6 +124,7 @@ jobs:
       TF_VAR_ENVIRONMENT: ${{ github.event.deployment.environment }}
       TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT_ID }}
       TF_VAR_container_image: ${{ needs.copy_container.outputs.gcp_container_name }}
+      OTHER: ${{ needs.copy_container.outputs.other_container_name }}
       TF_VAR_container_tag: ${{ needs.deploy_details.outputs.version }}
 
       # Directory that contains Terraform HCL to run
