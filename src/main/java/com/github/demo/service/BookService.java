@@ -23,7 +23,7 @@ public class BookService {
         booksDatabase = new BookDatabaseImpl(databaseUrl, databaseUser, databasePassword);
 
         String noDbInit = System.getenv("DB_NO_INIT");
-        if (noDbInit != null) {
+        if (noDbInit == null) {
             List<Book> books = new ArrayList<Book>(6);
 
             books.add(new Book("Jeff Sutherland","Scrum: The Art of Doing Twice the Work in Half the Time", "scrum.jpg"));

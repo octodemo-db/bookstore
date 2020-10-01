@@ -13,8 +13,8 @@
   "extensions": [
     "mtxr.sqltools",
     "mtxr.sqltools-driver-pg",
-    "vscjava.vscode-maven",
-    "ms-azuretools.vscode-docker"
+    "ms-azuretools.vscode-docker",
+    "vscjava.vscode-java-pack"
   ],
 
   "settings": {
