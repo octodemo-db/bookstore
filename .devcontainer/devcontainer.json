@@ -28,7 +28,7 @@
         "server": "localhost",
         "port": 5432,
         "database": "bookstore",
-        "username": "bookstoreUser",
+        "username": "admin",
         "askForPassword": true
       }
     ]
