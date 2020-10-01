@@ -39,21 +39,15 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
             <version>2.1.6.RELEASE</version>
-            <!--<version>3.0.11.RELEASE</version>-->
         </dependency>
         
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.27.0-GA</version>
-        </dependency>
-
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -64,7 +58,13 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.32.3.2</version>
-          </dependency>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.16</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
@@ -151,7 +151,7 @@
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>
-                    <jvmArgs>--illegal-access=debug</jvmArgs>
+                    <dumpOnStart>true</dumpOnStart>
                 </configuration>
             </plugin>
 
@@ -319,7 +319,7 @@
                         <artifactId>echo-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>gitub-actions-version</id>
+                                <id>github-actions-version</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>echo</goal>

@@ -22,7 +22,6 @@ public class InMemoryDatabaseTest {
         Collection<Book> books = new ArrayList<Book>(5);
         books.add(new Book("Peter Murray", "A Book"));
         booksDatabase.populate(books);
-        booksDatabase.populate(books);
     }
 
     @After

@@ -12,7 +12,8 @@
 
   "extensions": [
     "mtxr.sqltools",
-    "mtxr.sqltools-driver-pg"
+    "mtxr.sqltools-driver-pg",
+    "vscjava.vscode-maven"
   ],
 
   "settings": {
@@ -25,8 +26,8 @@
         "previewLimit": 50,
         "server": "localhost",
         "port": 5432,
-        "database": "",
-        "username": "admin",
+        "database": "bookstore",
+        "username": "bookstoreUser",
         "password": "password"
       }
     ]

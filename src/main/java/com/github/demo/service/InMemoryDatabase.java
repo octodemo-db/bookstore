@@ -25,6 +25,7 @@ public class InMemoryDatabase implements IBookDatabase {
             connection = DriverManager.getConnection("jdbc:sqlite::memory:");
             
             stmt = connection.createStatement();
+            stmt.executeUpdate("DROP TABLE IF EXISTS books");
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS books (id INTEGER PRIMARY KEY, title TEXT NOT NULL UNIQUE, author TEXT, image TEXT, rating INTEGER)");
         }
         catch(SQLException error) {
@@ -51,6 +52,8 @@ public class InMemoryDatabase implements IBookDatabase {
              ps = connection.prepareStatement("INSERT INTO books (title, author, image) VALUES(?, ?, ?)");
 
             for (Book book : books) {
+                System.out.println("Adding book: " + book.getTitle());
+
                 ps.setString(1, book.getTitle());
                 ps.setString(2, book.getAuthor());
                 ps.setString(3, book.getCover());

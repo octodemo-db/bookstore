@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Properties;
 
 @WebServlet(
-        name = "BookServlet",
-        urlPatterns = {""}
+    name = "BookServlet",
+    urlPatterns = {""}
 )
 @WebInitParam(name = "allowedTypes", value = "html")
 public class BookServlet extends HttpServlet {
@@ -51,6 +51,7 @@ public class BookServlet extends HttpServlet {
         ctx.setVariable("books", books);
         ctx.setVariable("version", versionProperties.getProperty("version"));
 
+        resp.setHeader("Content-Type", "text/html; charset=UTF-8");
         engine.process("books", ctx, resp.getWriter());
     }
 }
