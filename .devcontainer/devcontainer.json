@@ -1,0 +1,34 @@
+{
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  
+  "service": "app",
+  
+  "forwardPorts": [
+    8080,
+    5432
+  ],
+
+  "extensions": [
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg"
+  ],
+
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash",
+
+    "sqltools.connections": [
+      {
+        "name": "Container database",
+        "driver": "PostgreSQL",
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5432,
+        "database": "",
+        "username": "admin",
+        "password": "password"
+      }
+    ]
+  }
+}
