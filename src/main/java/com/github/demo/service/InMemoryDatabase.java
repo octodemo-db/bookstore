@@ -25,7 +25,7 @@ public class InMemoryDatabase implements IBookDatabase {
             connection = DriverManager.getConnection("jdbc:sqlite::memory:");
             
             stmt = connection.createStatement();
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Books (id INTEGER PRIMARY KEY, title TEXT, author TEXT, image TEXT, rating INTEGER, UNIQUE(title))");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS books (id INTEGER PRIMARY KEY, title TEXT NOT NULL UNIQUE, author TEXT, image TEXT, rating INTEGER)");
         }
         catch(SQLException error) {
             error.printStackTrace();
@@ -48,37 +48,40 @@ public class InMemoryDatabase implements IBookDatabase {
         PreparedStatement ps = null;
 
         try {
-            // ps = this.connection.prepareStatement("INSERT INTO Books VALUES(title = ?, author = ?, image = ?, rating = ?)");
-            ps = this.connection.prepareStatement("INSERT INTO Books VALUES(title = ?, author = ?, image = ?)");
+             ps = connection.prepareStatement("INSERT INTO books (title, author, image) VALUES(?, ?, ?)");
 
             for (Book book : books) {
                 ps.setString(1, book.getTitle());
                 ps.setString(2, book.getAuthor());
                 ps.setString(3, book.getCover());
                 // ps.setInt(4, (int) book.getRating());
+                ps.execute();
             }
         } catch (SQLException e) {
             //TODO
+            e.printStackTrace();
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
+                e.printStackTrace();
                 // Do nothing
                 ps = null;
             }
         }
+        System.out.println("Database populated");
     }
 
     public List<Book> getBooksByTitle(String name) {
         List<Book> books = new ArrayList<Book>();
-        
-        try {
-            Statement stmt = this.connection.createStatement();
 
-            // TODO: Jake - I'm getting some errors when searching for Steve Krug's book. Can you take a look?
-            String query = "SELECT * FROM Books WHERE title='%" + name + "%'";
+        Statement stmt = null;
+
+        try {
+            stmt = connection.createStatement();
+            String query = "SELECT * FROM books WHERE title='%" + name + "%'";
 
             ResultSet results = stmt.executeQuery(query);
 
@@ -94,12 +97,19 @@ public class InMemoryDatabase implements IBookDatabase {
             }
         }
         catch(SQLException error) {
-            // TODO: Jake - Can you sort out the logging?
             // I've seen people search for newlines for some reason
             System.out.println("ERROR: Failed while searching for '" + name + "'");
-        }
 
-        // TODO: Jake - Do we need to close the statement?
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+                // Do nothing
+            } finally {
+                stmt = null;
+            }
+        }
         return books;
     }
 
@@ -107,10 +117,9 @@ public class InMemoryDatabase implements IBookDatabase {
         List<Book> books = new ArrayList<Book>();
         
         try {
-            Statement stmt = this.connection.createStatement();
-            String query = "SELECT * FROM Books";
+            Statement stmt = connection.createStatement();
 
-            ResultSet rs = stmt.executeQuery(query);
+            ResultSet rs = stmt.executeQuery("SELECT * FROM books");
             while(rs.next()) {
                 Book book = new Book(
                     rs.getString("author"),
@@ -118,15 +127,24 @@ public class InMemoryDatabase implements IBookDatabase {
                     rs.getString("image")
                     // results.getInt("rating")
                 );
-
                 books.add(book);
             }
         }
         catch(SQLException error) {
             //TODO
+            error.printStackTrace();
         }
-
-        // TODO: Jake - Do we need to close the statement?
         return books;
-    }    
+    }
+
+    public void destroy() {
+        try {
+            this.connection.close();
+        } catch (SQLException throwables) {
+            // Ignore
+            throwables.printStackTrace();
+        } finally {
+            this.connection = null;
+        }
+    }
 }
