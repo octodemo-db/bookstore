@@ -14,8 +14,7 @@
     "mtxr.sqltools",
     "mtxr.sqltools-driver-pg",
     "vscjava.vscode-maven",
-    "ms-azuretools.vscode-docker",
-    "summersun.vscode-jetty"
+    "ms-azuretools.vscode-docker"
   ],
 
   "settings": {
