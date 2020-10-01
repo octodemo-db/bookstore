@@ -16,8 +16,8 @@ services:
       POSTGRES_PASSWORD: password
 
     volumes:
-      - type: volume
-        source: db-scripts
+      - type: bind
+        source: ./db-scripts
         target: /docker-entrypoint-initdb.d
         consistency: consistent
 
@@ -28,4 +28,3 @@ services:
 
 volumes:
   postgres-data:
-  db-scripts:
