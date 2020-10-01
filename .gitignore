@@ -19,6 +19,3 @@ scripts/.env
 # Terraform and Terragrunt
 .terraform
 *.generated.tf
-
-# VSCode
-.vscode

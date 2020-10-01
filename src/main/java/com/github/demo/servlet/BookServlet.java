@@ -23,6 +23,12 @@ import java.util.Properties;
 @WebInitParam(name = "allowedTypes", value = "html")
 public class BookServlet extends HttpServlet {
 
+    private BookService bookService;
+
+    public BookServlet() {
+        bookService = new BookService();
+    }
+
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -33,8 +39,7 @@ public class BookServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        BookService service = new BookService();
-        List books = service.getBooks();
+        List books = bookService.getBooks();
 
         Properties versionProperties = new Properties();
         versionProperties.load(getClass().getResourceAsStream("/version.properties"));

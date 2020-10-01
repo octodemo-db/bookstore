@@ -1,0 +1,164 @@
+package com.github.demo.service;
+
+import com.github.demo.model.Book;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import java.util.Properties;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+
+public class BookDatabaseImpl implements IBookDatabase {
+
+    private Connection connection;
+
+    public BookDatabaseImpl(String url, String username, String password) {
+        Statement statement = null;
+
+        try {
+            Properties props = new Properties();
+
+            if (username != null) {
+                props.setProperty("user", username);
+            }
+            if (password != null) {
+                props.setProperty("password", password);    
+            }
+
+            //TODO this might be problematic to in memory db
+            props.setProperty("ssl", "false");
+
+            connection = DriverManager.getConnection(url, props);
+
+            if (url.indexOf(":memory:") > -1) {
+                // Initialize the database tables for in memory database
+                statement = connection.createStatement();
+
+                statement.execute("CREATE TABLE IF NOT EXISTS books (" 
+                    + "id INTEGER PRIMARY KEY, "
+                    + "title TEXT NOT NULL, "
+                    + "author TEXT, "
+                    + "image TEXT, "
+                    + "rating, INTEGER "
+                    + ")"
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+            } catch (SQLException e) {
+                // Ignore
+            }
+        }
+    }
+
+    @Override
+    public void populate(Collection<Book> books) {
+        if (books != null && books.size() > 0) {
+            PreparedStatement ps = null;
+
+            try {
+                ps = connection.prepareStatement("INSERT INTO books (title, author, image) VALUES(?, ?, ?)");
+
+                for (Book book : books) {
+                    //TODO
+                    System.out.println("Adding book to database: " + book.getTitle());
+
+                    ps.setString(1, book.getTitle());
+                    ps.setString(2, book.getAuthor());
+                    ps.setString(3, book.getCover());
+                    ps.execute();
+                }
+            } catch (SQLException e) {
+                //TODO
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (ps != null) {
+                        ps.close();
+                    }
+                } catch (SQLException e) {
+                    //TODO
+                    e.printStackTrace();
+                    // Do nothing
+                    ps = null;
+                }
+            }
+            System.out.println("Database populated");
+        }
+    }
+
+    @Override
+    public List<Book> getAll() {
+        List<Book> books = new ArrayList<Book>();
+        
+        try {
+            Statement stmt = connection.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM books");
+            while(rs.next()) {
+                Book book = new Book(
+                    rs.getString("author"),
+                    rs.getString("title"),
+                    rs.getString("image")
+                );
+                books.add(book);
+            }
+        }
+        catch(SQLException error) {
+            //TODO
+            error.printStackTrace();
+        }
+        return books;
+    }
+
+    @Override
+    public List<Book> getBooksByTitle(String name) {
+        List<Book> books = new ArrayList<Book>();
+
+        Statement stmt = null;
+
+        try {
+            stmt = connection.createStatement();
+            String query = "SELECT * FROM books WHERE title='%" + name + "%'";
+
+            ResultSet results = stmt.executeQuery(query);
+
+            while(results.next()) {
+                Book book = new Book(
+                    results.getString("author"),
+                    results.getString("title"),
+                    results.getString("image")
+                    // results.getInt("rating")
+                );
+
+                books.add(book);
+            }
+        }
+        catch(SQLException error) {
+            // I've seen people search for newlines for some reason
+            System.out.println("ERROR: Failed while searching for '" + name + "'");
+
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+                // Do nothing
+            } finally {
+                stmt = null;
+            }
+        }
+        return books;
+    }
+}
