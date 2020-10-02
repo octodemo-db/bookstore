@@ -1,0 +1,31 @@
+# Docker Compose File for PostgreSQL Database Server
+version: '3.2'
+
+services:
+  app:
+    image: maven:3.6.3-jdk-11    
+    command: sleep infinity
+    network_mode: service:db
+
+  db:
+    image: postgres:12
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: bookstore
+
+    volumes:
+      - type: bind
+        source: ./db-scripts
+        target: /docker-entrypoint-initdb.d
+        consistency: consistent
+
+      - type: volume
+        source: postgres-data
+        target: /var/lib/postgresql/data
+        consistency: consistent
+
+volumes:
+  postgres-data:

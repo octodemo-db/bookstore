@@ -17,11 +17,17 @@ import java.util.List;
 import java.util.Properties;
 
 @WebServlet(
-        name = "BookServlet",
-        urlPatterns = {""}
+    name = "BookServlet",
+    urlPatterns = {""}
 )
 @WebInitParam(name = "allowedTypes", value = "html")
 public class BookServlet extends HttpServlet {
+
+    private BookService bookService;
+
+    public BookServlet() {
+        bookService = new BookService();
+    }
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -33,8 +39,7 @@ public class BookServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        BookService service = new BookService();
-        List books = service.getBooks();
+        List books = bookService.getBooks();
 
         Properties versionProperties = new Properties();
         versionProperties.load(getClass().getResourceAsStream("/version.properties"));
@@ -51,6 +56,7 @@ public class BookServlet extends HttpServlet {
         ctx.setVariable("books", books);
         ctx.setVariable("version", versionProperties.getProperty("version"));
 
+        resp.setHeader("Content-Type", "text/html; charset=UTF-8");
         engine.process("books", ctx, resp.getWriter());
     }
 }
