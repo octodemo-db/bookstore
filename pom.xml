@@ -376,9 +376,14 @@
                         <groupId>org.eclipse.jetty</groupId>
                         <artifactId>jetty-maven-plugin</artifactId>
                         <configuration>
-                            <jvmArgs>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005</jvmArgs>
+                            <jvmArgs>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 --illegal-access=warn</jvmArgs>
                             <stopPort>8081</stopPort>
                             <stopKey>jetty-vscode</stopKey>
+                            <env>
+                                <DATABASE_URL>jdbc:postgresql://db:5432/bookstore</DATABASE_URL>
+                                <DATABASE_USER>admin</DATABASE_USER>
+                                <DATABASE_PASSWORD>password</DATABASE_PASSWORD>
+                            </env>
                         </configuration>
                     </plugin>
                 </plugins>

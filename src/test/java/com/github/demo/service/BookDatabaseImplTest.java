@@ -9,19 +9,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
-import java.util.ArrayList;
 
-public class InMemoryDatabaseTest {
+public class BookDatabaseImplTest {
 
-    private InMemoryDatabase booksDatabase;
+    private BookDatabase booksDatabase;
 
     @Before
     public void setUp() throws Exception {
-        booksDatabase = new InMemoryDatabase();
-
-        Collection<Book> books = new ArrayList<Book>(5);
-        books.add(new Book("Peter Murray", "A Book"));
-        booksDatabase.populate(books);
+        booksDatabase = new BookDatabaseImpl();
     }
 
     @After
@@ -32,6 +27,6 @@ public class InMemoryDatabaseTest {
     @Test
     public void testGetBooks() {
         Collection<Book> books = booksDatabase.getAll();
-        assertEquals("Books in database should match", 1, books.size());
+        assertEquals("Books in database should match", BookUtils.getSampleBooks().size(), books.size());
     }
 }

@@ -14,9 +14,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
-public class BookDatabaseImpl implements IBookDatabase {
+public class BookDatabaseImpl implements BookDatabase {
 
     private Connection connection;
+
+    public BookDatabaseImpl() {
+        this(null, null, null);
+    }
 
     public BookDatabaseImpl(String url, String username, String password) {
         Statement statement = null;
@@ -31,8 +35,13 @@ public class BookDatabaseImpl implements IBookDatabase {
                 props.setProperty("password", password);    
             }
 
-            //TODO this might be problematic to in memory db
+            // This is a postgres specific setting, but SQLlite tolerates it
             props.setProperty("ssl", "false");
+
+            // Default to a sqlite in memory database if no database url has been provided
+            if (url == null) {
+                url = "jdbc:sqlite::memory:";
+            }
 
             connection = DriverManager.getConnection(url, props);
 
@@ -48,6 +57,8 @@ public class BookDatabaseImpl implements IBookDatabase {
                     + "rating, INTEGER "
                     + ")"
                 );
+                // Populate the database with some sample data
+                populate(BookUtils.getSampleBooks());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -160,5 +171,17 @@ public class BookDatabaseImpl implements IBookDatabase {
             }
         }
         return books;
+    }
+
+    @Override
+    public void destroy() {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            // Ignore
+            connection = null;
+        }
     }
 }
