@@ -33,6 +33,10 @@
       }
     ],
 
-    "java.project.importOnFirstTimeStartup": "automatic"
+    "java.project.importOnFirstTimeStartup": "automatic",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.server.launchMode": "Standard",
+
+    "telemetry.enableTelemetry": false
   }
 }
