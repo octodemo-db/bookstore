@@ -16,7 +16,7 @@
             "group": "test"
         },
         {
-            "label": "jettyRunDebug",
+            "label": "jettyStart",
             "type": "shell",
             "command": "mvn -B jetty:run-forked -Pvscode-debug",
             "isBackground": true,
@@ -33,6 +33,12 @@
                     "endsPattern": "^.*Listening for transport dt_socket at address.*"
                 }
             }]
+        },
+        {
+            "label": "jettyStop",
+            "type": "shell",
+            "command": "mvn -B jetty:stop -Pvscode-debug",
+            "isBackground": true
         }
     ]
 }

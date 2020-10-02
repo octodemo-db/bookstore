@@ -31,6 +31,8 @@
         "username": "admin",
         "askForPassword": true
       }
-    ]
+    ],
+
+    "java.project.importOnFirstTimeStartup": "automatic"
   }
 }

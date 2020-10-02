@@ -377,6 +377,8 @@
                         <artifactId>jetty-maven-plugin</artifactId>
                         <configuration>
                             <jvmArgs>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005</jvmArgs>
+                            <stopPort>8081</stopPort>
+                            <stopKey>jetty-vscode</stopKey>
                         </configuration>
                     </plugin>
                 </plugins>
