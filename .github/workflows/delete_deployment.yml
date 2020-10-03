@@ -1,21 +1,24 @@
 name: Deploy to Cloud
 
 on:
-  deployment
+  deployment_status
 
 env:
   GCP_SDK_VERSION: 312.0.0
 
 jobs:
   deploy_details:
+    
     name: Define Deployment Details
-
+    #add filter for deployment status
+    if: ${{ context.payload.deployment.status == 'inactive' }}
     runs-on: ubuntu-20.04
 
     outputs:
       ghcr_container: ${{ steps.deployment_data.outputs.container_image }}
       version: ${{ steps.deployment_data.outputs.version }}
-
+    
+    #check if this section is needed currently and adjust status update
     steps:
       - name: Extract Deployment Details and Report Deployment in Progress
         id: deployment_data
@@ -59,8 +62,8 @@ jobs:
               log_url: log_url
             })
 
-  delete:
-    name: Terraform Delete
+  destroy:
+    name: Terraform Destroy
     runs-on: ubuntu-20.04
 
     needs:
@@ -72,6 +75,7 @@ jobs:
     env:
       TF_VAR_ENVIRONMENT: ${{ github.event.deployment.environment }}
       TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT_ID }}
+      #do we need these tags?
       TF_VAR_container_image: ${{ needs.copy_container.outputs.gcp_container_name }}
       TF_VAR_container_tag: ${{ needs.deploy_details.outputs.version }}
 
@@ -101,6 +105,7 @@ jobs:
           service_account_key: ${{ secrets.GCP_TERRAFORM_SERVICE_ACCOUNT_KEY }}
           export_default_credentials: true
 
+      #check what parts are really needed for terraform destroy
       - name: Terraform - init
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
         run: terragrunt init
@@ -111,28 +116,13 @@ jobs:
 
       - name: Terraform - plan
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
-        run: terragrunt plan
+        run: terragrunt plan -auto-approve
 
-      - name: Terraform - apply
+      - name: Terraform - destroy
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
-        run: terragrunt apply -auto-approve
+        run: terragrunt destroy -auto-approve
 
-      - name: Get Website URL from Terrafom State
-        id: terraform_output
-        working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
-        run: terraform output website_url
-
-      - name: Report Success
-        uses: octokit/request-action@v1.x
-        with:
-          route: POST /repos/:owner/:repo/deployments/:deployment_id/statuses
-          deployment_id: ${{ github.event.deployment.id }}
-          environment: ${{ github.event.deployment.environment }}
-          description: "Deployed in ${{ github.event.deployment.environment }}"
-          state: "success"
-          environment_url: ${{ steps.terraform_output.outputs.stdout }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # add delete deployment status
 
       - name: Report Failure
         if: failure()
