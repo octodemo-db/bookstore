@@ -1,4 +1,4 @@
-name: Deploy to Cloud
+name: Destroy Environment - Terraform
 
 on:
   deployment_status
