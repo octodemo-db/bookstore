@@ -17,7 +17,6 @@ The Workflow files in this repository provide the following features:
 
 ## Running the Web Application locally
 
-You can run the web application locally using Maven for development purposes, which can be done either directly if you 
 have Maven and a JDK installed, or inside a container that has Maven and JDK installed.
 
 

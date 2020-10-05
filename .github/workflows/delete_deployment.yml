@@ -7,67 +7,11 @@ env:
   GCP_SDK_VERSION: 312.0.0
 
 jobs:
-  deploy_details:
-    
-    name: Define Deployment Details
-    #add filter for deployment status
-    if: ${{ context.payload.deployment.status == 'inactive' }}
-    runs-on: ubuntu-20.04
-
-    outputs:
-      ghcr_container: ${{ steps.deployment_data.outputs.container_image }}
-      version: ${{ steps.deployment_data.outputs.version }}
-    
-    #check if this section is needed currently and adjust status update
-    steps:
-      - name: Extract Deployment Details and Report Deployment in Progress
-        id: deployment_data
-        uses: actions/github-script@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const run = process.env.GITHUB_RUN_ID
-              , log_url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${run}`
-              ;
-
-            const deployment = context.payload.deployment
-              , environment = deployment.environment
-              , deploymentPayload = JSON.parse(deployment.payload)
-              , containerRegistryUrl = `${deploymentPayload.container_registry}`
-              , containerImage = `${deploymentPayload.container_image}`
-              , deploymentRef = deploymentPayload.ref
-              , version = (containerImage.split(':')).pop()
-              ;
-
-            const webAppName = `${context.repo.repo}-${environment}`
-
-            core.setOutput('container_registry_url', containerRegistryUrl);
-            core.setOutput('container_image', containerImage);
-            core.setOutput('webapp_name', webAppName);
-            core.setOutput('deployment_github_ref', deploymentRef);
-            core.setOutput('app_type', environment == 'prod' ? 'prod' : 'review');
-            core.setOutput('environment', environment);
-            core.setOutput('version', version);
-            
-            github.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              mediaType: {
-                previews: ["flash-preview", "ant-man"]
-              },
-              deployment_id: context.payload.deployment.id,
-              state: 'in_progress',
-              description: 'Deployment from GitHub Actions started',
-              target_url: log_url,
-              log_url: log_url
-            })
-
+  
   destroy:
     name: Terraform Destroy
+    if: context.payload.deployment.status == 'inactive'
     runs-on: ubuntu-20.04
-
-    needs:
-      - deploy_details
 
     timeout-minutes: 5
 
@@ -75,9 +19,6 @@ jobs:
     env:
       TF_VAR_ENVIRONMENT: ${{ github.event.deployment.environment }}
       TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT_ID }}
-      #do we need these tags?
-      TF_VAR_container_image: ${{ needs.copy_container.outputs.gcp_container_name }}
-      TF_VAR_container_tag: ${{ needs.deploy_details.outputs.version }}
 
       # Directory that contains Terraform HCL to run
       TERRAFORM_WORKING_DIRECTORY: ./terraform
@@ -105,33 +46,10 @@ jobs:
           service_account_key: ${{ secrets.GCP_TERRAFORM_SERVICE_ACCOUNT_KEY }}
           export_default_credentials: true
 
-      #check what parts are really needed for terraform destroy
       - name: Terraform - init
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
         run: terragrunt init
 
-      - name: Terraform - validate
-        working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
-        run: terragrunt validate
-
-      - name: Terraform - plan
-        working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
-        run: terragrunt plan -auto-approve
-
       - name: Terraform - destroy
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
         run: terragrunt destroy -auto-approve
-
-      # add delete deployment status
-
-      - name: Report Failure
-        if: failure()
-        uses: octokit/request-action@v1.x
-        with:
-          route: POST /repos/:owner/:repo/deployments/:deployment_id/statuses
-          deployment_id: ${{ github.event.deployment.id }}
-          description: "Deploy failed for ${{ github.event.deployment.environment }}"
-          environment: ${{ github.event.deployment.environment }}
-          state: "failure"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
