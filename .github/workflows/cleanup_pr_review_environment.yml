@@ -11,10 +11,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get temporary token for invalidating deployment(s)
+        id: temp_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.OCTODEMOBOT_APPLICATION_ID_REPO_AUTOMATION }}
+          application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
+          
       - name: Mark environments as inactive in GitHub
         uses: actions/github-script@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ steps.temp_token.outputs.token }}
           script: |
             console.log(context.payload.pull_request.head.ref)
 
@@ -34,7 +41,7 @@ jobs:
                     mediaType: {previews: ["flash-preview", "ant-man"]},
                     deployment_id: deployment.id,
                     state: 'inactive',
-                    description: 'Pull Request Merged, destroying review environment'
+                    description: 'Pull Request Merged/Closed, removing review environment'
                   })
                 );
               });
