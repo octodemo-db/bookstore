@@ -35,6 +35,8 @@ jobs:
               const promises = [];
 
               deployments.data.forEach(deployment => {
+                console.log(`Deployment: ${JSON.stringify(deployment)} transitioning to inactive`);
+                
                 promises.push(github.repos.createDeploymentStatus({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
