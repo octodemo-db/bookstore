@@ -35,7 +35,7 @@ jobs:
               const promises = [];
 
               deployments.data.forEach(deployment => {
-                console.log(`Deployment: ${JSON.stringify(deployment)} transitioning to failure`);
+                console.log(`Deployment: ${deployment.id}:${deployment.environment} transitioning to failure`);
                 
                 promises.push(github.repos.createDeploymentStatus({
                     owner: context.repo.owner,
