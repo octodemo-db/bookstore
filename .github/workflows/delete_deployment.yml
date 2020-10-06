@@ -10,7 +10,7 @@ jobs:
   
   destroy:
     name: Terraform Destroy
-    if: context.payload.deployment.status == 'inactive'
+    if: context.payload.deployment.status == 'failure'
     runs-on: ubuntu-20.04
 
     timeout-minutes: 5
@@ -53,3 +53,14 @@ jobs:
       - name: Terraform - destroy
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
         run: terragrunt destroy -auto-approve
+        
+      - name: Remove Environment
+        if: success()
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.repos.deleteDeployment({
+              ...context.repo,
+              deployment_id: context.deployment.id
+            });
