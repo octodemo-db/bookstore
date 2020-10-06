@@ -2,7 +2,7 @@
 name: Deployment Status Change
 
 on:
-  deployment_status
+  deployment_status:
   
 jobs:
   report:
