@@ -60,7 +60,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            console.log(`Removing Deployment after Terraform destroy: ${context.payload.deployment.id}:${context.payload.deployment.environment}`;
+            console.log(`Removing Deployment after Terraform destroy: ${context.payload.deployment.id}:${context.payload.deployment.environment}`);
             
             await github.repos.deleteDeployment({
               ...context.repo,
