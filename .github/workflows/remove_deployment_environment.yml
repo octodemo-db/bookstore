@@ -1,4 +1,4 @@
-name: Destroy Environment - Terraform
+name: Remove Deployment Environment - Terraform
 
 on:
   deployment_status
