@@ -35,15 +35,28 @@ jobs:
               const promises = [];
 
               deployments.data.forEach(deployment => {
-                console.log(`Deployment: ${deployment.id}:${deployment.environment} transitioning to failure`);
-                
-                promises.push(github.repos.createDeploymentStatus({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    mediaType: {previews: ["flash-preview", "ant-man"]},
+                promises.push(
+                  github.repos.listDeploymentStatuses({
+                    ...context.repo,
                     deployment_id: deployment.id,
-                    state: 'failure',
-                    description: 'Pull Request Merged/Closed, removing review environment'
+                    per_page: 100,
+                  }).then(statuses => {
+                    if (statuses.data) {
+                      // The first state is the most current state for the deployment
+                      const currentState = statuses.data[0];
+                      if (currentState !== 'failure') {
+                        console.log(`Deployment: ${deployment.id}:${deployment.environment} transitioning to failure`);
+                        
+                        return github.repos.createDeploymentStatus({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          mediaType: {previews: ["flash-preview", "ant-man"]},
+                          deployment_id: deployment.id,
+                          state: 'failure',
+                          description: 'Pull Request Merged/Closed, removing review environment'
+                        })
+                      }
+                    }
                   })
                 );
               });
