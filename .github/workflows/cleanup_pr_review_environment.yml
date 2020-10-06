@@ -35,14 +35,14 @@ jobs:
               const promises = [];
 
               deployments.data.forEach(deployment => {
-                console.log(`Deployment: ${JSON.stringify(deployment)} transitioning to inactive`);
+                console.log(`Deployment: ${JSON.stringify(deployment)} transitioning to failure`);
                 
                 promises.push(github.repos.createDeploymentStatus({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     mediaType: {previews: ["flash-preview", "ant-man"]},
                     deployment_id: deployment.id,
-                    state: 'inactive',
+                    state: 'failure',
                     description: 'Pull Request Merged/Closed, removing review environment'
                   })
                 );
