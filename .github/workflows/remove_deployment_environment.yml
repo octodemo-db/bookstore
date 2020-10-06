@@ -62,5 +62,5 @@ jobs:
           script: |
             await github.repos.deleteDeployment({
               ...context.repo,
-              deployment_id: context.deployment.id
+              deployment_id: context.payload.deployment_status.deployment.id
             });
