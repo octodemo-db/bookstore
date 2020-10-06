@@ -60,6 +60,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            console.log(JSON.stringify(context.payload));
             await github.repos.deleteDeployment({
               ...context.repo,
               deployment_id: context.payload.deployment_status.deployment.id
