@@ -1,4 +1,4 @@
-name: Tear down environments
+name: Cleanup PR Environments
 
 on:
   pull_request:
