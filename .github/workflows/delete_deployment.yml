@@ -10,7 +10,7 @@ jobs:
   
   destroy:
     name: Terraform Destroy
-    if: context.payload.deployment.status == 'inactive'
+    if: github.payload.deployment.status == 'inactive'
     runs-on: ubuntu-20.04
 
     timeout-minutes: 5
