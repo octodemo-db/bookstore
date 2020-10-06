@@ -10,7 +10,7 @@ jobs:
   
   destroy:
     name: Terraform Destroy
-    if: github.payload.deployment.status == 'failure'
+    if: github.payload.deployment_status.state == 'failure'
     runs-on: ubuntu-20.04
 
     timeout-minutes: 5
