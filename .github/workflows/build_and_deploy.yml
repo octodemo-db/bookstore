@@ -140,7 +140,7 @@ jobs:
       - name: Publish Docker image
         id: container_publish
         run: |
-          docker push ${{ steps.container_details.outputs.container_registry_tag }}
+          docker push ghcr.io/${{ steps.container_details.outputs.container_registry_tag }}
 
       - name: Publish DB Container as a Status
         id: container_image_status
