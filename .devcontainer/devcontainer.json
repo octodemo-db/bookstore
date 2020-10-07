@@ -20,7 +20,8 @@
     "vscjava.vscode-java-dependency",
     "vscjava.vscode-java-test",
     "dgileadi.java-decompiler",
-    "redhat.vscode-xml"
+    "redhat.vscode-xml",
+    "redhat.vscode-yaml"
   ],
 
   "settings": {
