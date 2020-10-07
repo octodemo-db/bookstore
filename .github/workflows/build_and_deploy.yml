@@ -5,13 +5,43 @@ on:
     branches:
       - main
 
-# The name of the `Build (ubuntu 20.04, 1.8)` build is used as a required context inside the repository on protected
+# The name of the `Build (ubuntu 20.04, 11)` build is used as a required context inside the repository on protected
 #  branches configuration. Any changes to the OS or Java version will need to be reflected in repository settings.
 
 jobs:
+  build_parameters:
+    name: Define Build Parameters
+    runs-on: ubuntu-20.04
+
+    # We need to share details across job boundaries, expose the step outs at the job level
+    outputs:
+      container_name: ${{ steps.build_params.outputs.container_name }}
+      maven_changelist: ${{ steps.build_params.outputs.maven_changelist }}
+      maven_sha1: ${{ steps.build_params.outputs.maven_sha1 }}
+      github_branch_name: ${{ steps.build_params.outputs.github_ref_branch_name }}
+      github_short_sha: ${{ steps.build_params.outputs.github_short_sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Define Build Parameters
+        id: build_params
+        uses: actions/github-script@v2
+        with:
+          script: |
+            const scriptPath = require('path').resolve('./.github/workflows/scripts/build_parameters.js')
+              , buildParameters = require(scriptPath);
+            ;
+            buildParameters(context, core).injectBuildParameters();
+
+
   build:
     name: Build, Test and Package
     runs-on: ubuntu-20.04
+
+    needs:
+      - build_parameters
 
     # We need to share details across job boundaries, expose the step outs at the job level
     outputs:
@@ -22,10 +52,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up JDK 1.8
+      - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 11
 
       # Utilize caching of the resolved plugins and dependencies from previous Maven builds to provide
       # faster builds when dependencies have not changed.
@@ -40,25 +70,15 @@ jobs:
             mvn-${{ matrix.java }}-${{ runner.os }}
             mvn-${{ matrix.java }}
             mvn-
-
-      - name: Define Build Parameters
-        id: build_params
-        uses: actions/github-script@v2
-        with:
-          script: |
-            const scriptPath = require('path').resolve('./.github/workflows/scripts/build_parameters.js')
-              , buildParameters = require(scriptPath);
-            ;
-            buildParameters(context, core).injectBuildParameters();
-
+      
       - name: Build Test and Package
         id: maven_build
         run: |
           mvn package -B \
-            -Dsha1="${{ steps.build_params.outputs.maven_sha1 }}" \
-            -Dchangelist="${{ steps.build_params.outputs.maven_changelist }}" \
-            -Dgithub.repository="${{ steps.build_params.outputs.github_repository }}" \
-            -Dcontainer.image.name="${{ steps.build_params.outputs.container_name }}"
+            -Dsha1="${{ needs.build_parameters.outputs.maven_sha1 }}" \
+            -Dchangelist="${{ needs.build_parameters.outputs.maven_changelist }}" \
+            -Dgithub.repository="${GITHUB_REPOSITORY}" \
+            -Dcontainer.image.name="${{ needs.build_parameters.outputs.container_name }}"
         shell: bash
 
       # Publish the container if we successfully build under Linux
@@ -74,22 +94,71 @@ jobs:
         run: |
           docker push ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
 
-      - name: Publish Container as a Status
+      - name: Publish App Container as a Status
         id: container_image_status
         uses: Sibz/github-status-action@v1
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
           state: success
-          context: Container Image Published
-          description: ${{ steps.maven_build.outputs.container_deployment_registry_tag }} ${{ steps.maven_build.outputs.container_registry }}
-
+          context: Container Image Published - Application
+          description: ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
       
+
+  build_database:
+    name: Build Database Container
+    runs-on: ubuntu-20.04
+
+    needs:
+      - build_parameters
+
+    # We need to share details across job boundaries, expose the step outs at the job level
+    outputs:
+      container_image_tag: ${{ steps.container_details.outputs.container_registry_tag }}
+      container_registry_url: ghcr.io
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Container Details
+        id: container_details
+        run: |
+          echo "::set-output name=container_registry_tag::${{ needs.build_parameters.outputs.container_name }}_database:${{ needs.build_parameters.outputs.github_short_sha }}"
+
+      - name: Build Container
+        working-directory: database
+        run: |
+          docker build . --tag ghcr.io/${{ steps.container_details.outputs.container_registry_tag }}
+        
+      - name: Sign in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.OCTODEMOBOT_GHPR_TOKEN }}
+          registry: ghcr.io
+      
+      - name: Publish Docker image
+        id: container_publish
+        run: |
+          docker push ${{ steps.container_details.outputs.container_registry_tag }}
+
+      - name: Publish DB Container as a Status
+        id: container_image_status
+        uses: Sibz/github-status-action@v1
+        with:
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          state: success
+          context: Container Image Published - Database
+          description: ${{ steps.container_details.outputs.container_registry_tag }}
+
 
   deploy:
     name: Create Deployment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+
     needs:
       - build
+      - build_database
 
     steps:
       - name: Get temporary token for creating deployment
@@ -105,6 +174,7 @@ jobs:
         env:
           container_registry_url: ${{ needs.build.outputs.container_registry_url }}
           container_image: ${{ needs.build.outputs.container_image_tag }}
+
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |

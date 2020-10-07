@@ -80,8 +80,14 @@ jobs:
           password: ${{ secrets.OCTODEMOBOT_GHPR_TOKEN }}
           registry: ghcr.io
     
-      - name: Pull GHCR Docker image
-        id: container_publish
+      - name: Pull GHCR Application Container image
+        id: container_publish_app
+        run: |
+          docker pull ${{ needs.deploy_details.outputs.ghcr_container }}
+          docker tag ${{ needs.deploy_details.outputs.ghcr_container }} $GCR_CONTAINER_IMAGE
+
+      - name: Pull GHCR Database Container image
+        id: container_publish_db
         run: |
           docker pull ${{ needs.deploy_details.outputs.ghcr_container }}
           docker tag ${{ needs.deploy_details.outputs.ghcr_container }} $GCR_CONTAINER_IMAGE

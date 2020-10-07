@@ -18,7 +18,7 @@ services:
 
     volumes:
       - type: bind
-        source: ./db-scripts
+        source: ../database/db-scripts
         target: /docker-entrypoint-initdb.d
         consistency: consistent
 

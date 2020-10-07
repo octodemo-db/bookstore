@@ -33,7 +33,7 @@
         <github.repository>octodemo-db/bookstore</github.repository>
         <!-- The container registry to publish to -->
         <container.image.registry>ghcr.io</container.image.registry>
-        <container.image.name>octodemo-db-${project.artifactId}</container.image.name>
+        <container.image.name>octodemo-db/${project.artifactId}</container.image.name>
     </properties>
     
     <dependencies>
