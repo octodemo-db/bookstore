@@ -8,9 +8,9 @@ jobs:
     name: Create deployment
     runs-on: ubuntu-latest
     if: |
-      github.event.issue.body == '/deploy test' ||
-      github.event.issue.body == '/deploy staging' ||
-      github.event.issue.body == '/deploy qa'
+      github.event.issue_comment.body == '/deploy test' ||
+      github.event.issue_comment.body == '/deploy staging' ||
+      github.event.issue_comment.body == '/deploy qa'
 
     steps:
       - name: Debug
