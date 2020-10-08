@@ -17,5 +17,7 @@ jobs:
         uses: actions/github-script@v2
         with:
           script: |
+            console.log("\n${{ github.event }}:\n\n");
             console.log(${{ github.event }}, null, 2)
+            console.log("\ncontext:\n\n");
             console.log(JSON.stringify(context, null, 2));
