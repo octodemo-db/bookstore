@@ -10,7 +10,7 @@ jobs:
     if: |
       github.event.issue.body == '/deploy test' ||
       github.event.issue.body == '/deploy staging' ||
-      github.event.issue.body == '/deploy qa' ||
+      github.event.issue.body == '/deploy qa'
 
     steps:
       - name: Debug
