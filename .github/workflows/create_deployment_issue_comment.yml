@@ -31,7 +31,8 @@ jobs:
       - name: Add label using temporary token
         uses: actions/github-script@v3
         with:
-          github-token: ${{ steps.temp_token.outputs.token }}
+          # github-token: ${{ steps.temp_token.outputs.token }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const comment = context.payload.comment;
             const target = comment.body.replace('/deploy ', '')
