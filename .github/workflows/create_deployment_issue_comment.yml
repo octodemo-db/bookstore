@@ -5,7 +5,7 @@ on:
 
 jobs:
   deployment:
-    name: Create deployment
+    name: Add label
     runs-on: ubuntu-latest
     if: |
       github.event.comment.body == '/deploy test' ||
@@ -13,9 +13,33 @@ jobs:
       github.event.comment.body == '/deploy qa'
 
     steps:
-      - name: Debug
-        uses: actions/github-script@v2
+      - name: Output workflow context (for debugging)
+        uses: actions/github-script@v3
         with:
           script: |
-            console.log("\ncontext:\n\n");
             console.log(JSON.stringify(context, null, 2));
+
+      - name: Get temporary token for adding label
+        id: temp_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+         application_id: ${{ secrets.OCTODEMOBOT_APPLICATION_ID_REPO_AUTOMATION }}
+          application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
+
+          apply-label:
+
+      - name: Add label using temporary token
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ steps.temp_token.outputs.token }}
+          script: |
+            const target = context.payload.body.replace('/deploy ', '')
+                          .replace('test', 'Test')
+                          .replace('staging', 'Staging')
+                          .replace('qa', 'QA');
+            github.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: [`Deploy to ${target}`]
+            });
