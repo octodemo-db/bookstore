@@ -34,11 +34,7 @@ jobs:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
             const comment = context.payload.comment;
-            const target = comment.body
-                           .replace('/deploy ', '')
-                           .replace('test', 'Test')
-                           .replace('staging', 'Staging')
-                           .replace('qa', 'QA');
+            const target = comment.body.replace('/deploy ', '')
             github.issues.addLabels({
               ...context.repo,
               issue_number: context.issue.number,
