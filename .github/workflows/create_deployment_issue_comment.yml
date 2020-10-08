@@ -7,17 +7,15 @@ jobs:
   deployment:
     name: Create deployment
     runs-on: ubuntu-latest
-    # if: |
-    #   github.event.issue_comment.body == '/deploy test' ||
-    #   github.event.issue_comment.body == '/deploy staging' ||
-    #   github.event.issue_comment.body == '/deploy qa'
+    if: |
+      github.event.comment.body == '/deploy test' ||
+      github.event.comment.body == '/deploy staging' ||
+      github.event.comment.body == '/deploy qa'
 
     steps:
       - name: Debug
         uses: actions/github-script@v2
         with:
           script: |
-            console.log("\n${{ github.event }}:\n\n");
-            console.log(JSON.stringify(${{ github.event }}, null, 2));
             console.log("\ncontext:\n\n");
             console.log(JSON.stringify(context, null, 2));
