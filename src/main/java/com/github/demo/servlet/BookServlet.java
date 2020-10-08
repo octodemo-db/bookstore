@@ -1,5 +1,6 @@
 package com.github.demo.servlet;
 
+import com.github.demo.model.Book;
 import com.github.demo.service.BookService;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -23,6 +24,8 @@ import java.util.Properties;
 @WebInitParam(name = "allowedTypes", value = "html")
 public class BookServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
+
     private BookService bookService;
 
     public BookServlet() {
@@ -39,7 +42,7 @@ public class BookServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        List books = bookService.getBooks();
+        List<Book> books = bookService.getBooks();
 
         Properties versionProperties = new Properties();
         versionProperties.load(getClass().getResourceAsStream("/version.properties"));
