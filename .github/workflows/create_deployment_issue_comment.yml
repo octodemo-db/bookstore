@@ -38,8 +38,6 @@ jobs:
                           .replace('staging', 'Staging')
                           .replace('qa', 'QA');
             github.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              ...context.repo,
               labels: [`Deploy to ${target}`]
             });
