@@ -23,7 +23,7 @@ jobs:
         id: temp_token
         uses: peter-murray/workflow-application-token-action@v1
         with:
-         application_id: ${{ secrets.OCTODEMOBOT_APPLICATION_ID_REPO_AUTOMATION }}
+          application_id: ${{ secrets.OCTODEMOBOT_APPLICATION_ID_REPO_AUTOMATION }}
           application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
 
           apply-label:
