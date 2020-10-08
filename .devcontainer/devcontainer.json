@@ -21,7 +21,8 @@
     "vscjava.vscode-java-test",
     "dgileadi.java-decompiler",
     "redhat.vscode-xml",
-    "redhat.vscode-yaml"
+    "redhat.vscode-yaml",
+    "hashicorp.terraform"
   ],
 
   "settings": {
