@@ -39,26 +39,38 @@ jobs:
               console.log(`ack merge request!`);
 
               const user = context.payload.comment.user.login;
+              const teamName = 'project-leads';
 
               console.log(`Checking @${user} membership in project-leads team`);
-              try {
-                const isMember = await github.teams.getMembershipForUserInOrg({
-                  org: context.payload.organization.login,
-                  team_slug: 'project-leads',
-                  username: user,
-                });
-                console.log(`Is Member: ${JSON.stringify(isMember.data, null, 2)}`);
-              } catch (err) {
-                console.log(JSON.stringify(err));
-              }
               
-              //if (context.payload.sender.login === 'pmanlukas' || context.payload.sender.login === 'peter-murray') {
-              //  
-              //  await github.pulls.merge({
-              //    ...context.repo,
-              //    pull_number: context.payload.issue.number
-              //  })
-              //} else {
-              //  console.log(`Unsupported deployment request to "${request ? request[1] : null}"`);
-              //}
+              const isMember = await github.teams.getMembershipForUserInOrg({
+                org: context.payload.organization.login,
+                team_slug: teamName,
+                username: user,
+              });
+
+              let commentBody = null;
+
+              if (isMember.status === 404) {
+                const commentBody = `:red_circle: User @${user} is not privileged to run the command! Only members of ${teamName} can perform this operation.`;
+              } else {
+                console.log(`User is a member of the required team ${teamName}`);
+                try {
+                  await github.pulls.merge({
+                    ...context.repo,
+                    pull_number: context.payload.issue.number
+                  });
+                } catch (err) {
+                  commentBody = `Well this is embarassing... Something went wrong performing merge: ${err.message}`;
+                }
+              }
+
+              // Report back via a comment to the issue if we have something to relay to the issue/user
+              if (commentBody) {
+                await github.issues.createComment({
+                    ...context.repo,
+                    issue_number: context.issue.number,
+                    body: commentBody,
+                });
+              }
             } 
