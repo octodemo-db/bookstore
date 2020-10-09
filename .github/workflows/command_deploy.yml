@@ -42,5 +42,5 @@ jobs:
                 labels: [`Deploy to ${request[1]}`]
               });
             } else {
-              console.log(`Unsupported deployment request to "${request ? request[1] : null}"`
+              console.log(`Unsupported deployment request to "${request ? request[1] : null}"`);
             }
