@@ -12,7 +12,8 @@ jobs:
     name: Command
 
     runs-on: ubuntu-20.04
-    
+
+    # This is only a valid request if we are on a pull request, gate for that by checking the pull_request information in the payload
     if: startsWith(github.event.comment.body, '/merge') && github.event.issue.pull_request != null 
 
     steps:
@@ -31,20 +32,34 @@ jobs:
             console.log(JSON.stringify(context.payload, null, 2));
             
             const comment = context.payload.comment.body;
-
             const request = /^\/merge/.exec(comment);
 
-            // Ensure request is one of the allowed options
+            // Ensure request is valid
             if (request) {
               console.log(`ack merge request!`);
 
-              if (context.payload.sender.login === 'pmanlukas' || context.payload.sender.login === 'peter-murray') {
-                console.log(context.payload.issue.number);
-                await github.pulls.merge({
-                  ...context.repo,
-                  pull_number: context.payload.issue.number
-                })
-              } else {
-                console.log(`Unsupported deployment request to "${request ? request[1] : null}"`);
+              const user = context.payload.comment.user.login;
+
+              console.log(`Checking @${user} membership in project-leads team`);
+              try {
+                const isMember = await github.teams.getMembershipForUserInOrg({
+                  org: context.payload.organization.login,
+                  team_slug: 'project-leads'
+                  username: user
+                });
+                console.log(`Is Member: ${JSON.stringify(isMemeber, null, 2)}`);
+              } catch (err) {
+                console.log(JSON.stringify(err));
               }
+              
+              # const projectLeads = await github.
+              # if (context.payload.sender.login === 'pmanlukas' || context.payload.sender.login === 'peter-murray') {
+                
+              #   await github.pulls.merge({
+              #     ...context.repo,
+              #     pull_number: context.payload.issue.number
+              #   })
+              # } else {
+              #   console.log(`Unsupported deployment request to "${request ? request[1] : null}"`);
+              # }
             } 
