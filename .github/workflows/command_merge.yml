@@ -1,0 +1,50 @@
+name: Command - merge
+
+on:
+  issue_comment:
+    types:
+      - created
+      - edited
+
+jobs:
+
+  command:
+    name: Command
+
+    runs-on: ubuntu-20.04
+    
+    if: startsWith(github.event.comment.body, '/merge') && github.event.issue.pull_request != null 
+
+    steps:
+      - name: Get temporary token
+        id: temp_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.OCTODEMOBOT_APPLICATION_ID_REPO_AUTOMATION }}
+          application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
+
+      - name: Parse and Respond to Command
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ steps.temp_token.outputs.token }}
+          script: |
+            console.log(JSON.stringify(context.payload, null, 2));
+            
+            const comment = context.payload.comment.body;
+
+            const request = /^\/merge/.exec(comment);
+
+            // Ensure request is one of the allowed options
+            if (request) {
+              console.log(`ack merge request!`);
+
+              if (context.payload.sender.login === 'pmanlukas' || context.payload.sender.login === 'peter-murray') {
+                console.log(context.payload.issue.number);
+                await github.pulls.merge({
+                  ...context.repo,
+                  pull_number: context.payload.issue.number
+                })
+              } else {
+                console.log(`Unsupported deployment request to "${request ? request[1] : null}"`);
+              }
+            } 

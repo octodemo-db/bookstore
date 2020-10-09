@@ -19,3 +19,5 @@ scripts/.env
 # Terraform and Terragrunt
 .terraform
 *.generated.tf
+terraform.tfstate
+terraform.tfstate.*
