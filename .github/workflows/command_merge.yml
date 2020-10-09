@@ -52,14 +52,13 @@ jobs:
                 console.log(JSON.stringify(err));
               }
               
-              # const projectLeads = await github.
-              # if (context.payload.sender.login === 'pmanlukas' || context.payload.sender.login === 'peter-murray') {
-                
-              #   await github.pulls.merge({
-              #     ...context.repo,
-              #     pull_number: context.payload.issue.number
-              #   })
-              # } else {
-              #   console.log(`Unsupported deployment request to "${request ? request[1] : null}"`);
-              # }
+              //if (context.payload.sender.login === 'pmanlukas' || context.payload.sender.login === 'peter-murray') {
+              //  
+              //  await github.pulls.merge({
+              //    ...context.repo,
+              //    pull_number: context.payload.issue.number
+              //  })
+              //} else {
+              //  console.log(`Unsupported deployment request to "${request ? request[1] : null}"`);
+              //}
             } 
