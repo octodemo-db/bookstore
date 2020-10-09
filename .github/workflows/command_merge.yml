@@ -65,7 +65,7 @@ jobs:
               } catch (err) {
                 console.log(err.status);
                 if (err.status === 404) {
-                  commentBody = `:red_circle:  User @${user} is not privileged to run the command! Only members of /`${teamName}/` can perform this operation.`;
+                  commentBody = `:red_circle:  User @${user} is not privileged to run the command! Only members of __${teamName}__ can perform this operation.`;
                 } else {
                   commentBody = `:red_circle:  Unexpected error encountered when running command! Status: ${err.status} error: ${JSON.stringify(err.data)}`;
                 }
