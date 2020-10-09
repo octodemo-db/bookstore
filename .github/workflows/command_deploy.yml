@@ -30,7 +30,7 @@ jobs:
           script: |
             console.log(JSON.stringify(context.payload, null, 2));
             
-            const comment = context.payload.comment;
+            const comment = context.payload.comment.body;
 
             const request = /\/deploy (.*)/.exec(comment);
 
