@@ -51,9 +51,7 @@ jobs:
                   org: context.payload.organization.login,
                   team_slug: teamName,
                   username: user,
-                });  
-
-                console.log(`Is User an active team member? ${isMember.data.active}`);
+                });
 
                 console.log(`User is a member of the required team ${teamName}`);
                 try {
@@ -66,7 +64,11 @@ jobs:
                 }
               } catch (err) {
                 console.log(err.status);
-                commentBody = `:red_circle: User @${user} is not privileged to run the command! Only members of ${teamName} can perform this operation.`;
+                if (err.status === 404) {
+                  commentBody = `:red_circle:  User @${user} is not privileged to run the command! Only members of /`${teamName}/` can perform this operation.`;
+                } else {
+                  commentBody = `:red_circle:  Unexpected error encountered when running command! Status: ${err.status} error: ${JSON.stringify(err.data)}`;
+                }
               }
               
               // Report back via a comment to the issue if we have something to relay to the issue/user
