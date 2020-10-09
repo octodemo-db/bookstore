@@ -125,7 +125,7 @@ jobs:
       TF_VAR_container_tag: ${{ needs.deploy_details.outputs.version }}
 
       # Directory that contains Terraform HCL to run
-      TERRAFORM_WORKING_DIRECTORY: ./terraform
+      TERRAFORM_WORKING_DIRECTORY: ./terraform/cloud_run
 
     steps:
       - name: Checkout Sources
