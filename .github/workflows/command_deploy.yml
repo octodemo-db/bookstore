@@ -28,6 +28,8 @@ jobs:
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
+            console.log(JSON.stringify(context.payload, null, 2));
+            
             const comment = context.payload.comment;
 
             const request = /\/deploy (.*)/.exec(comment);
