@@ -13,7 +13,7 @@ jobs:
 
     runs-on: ubuntu-20.04
     
-    if: startsWith(github.event.comment.body, '/merge')
+    if: startsWith(github.event.comment.body, '/merge') && github.event.issue.pull_request != null 
 
     steps:
       - name: Get temporary token
@@ -38,11 +38,11 @@ jobs:
             if (request) {
               console.log(`ack merge request!`);
 
-              if (context.payload.actor.login === 'pmanlukas' || context.payload.actor.login === 'peter-murray') {
-                console.log(context.payload.issue.id);
+              if (context.payload.sender.login === 'pmanlukas' || context.payload.sender.login === 'peter-murray') {
+                console.log(context.payload.issue.number);
                 await github.pulls.merge({
                   ...context.repo,
-                  pull_number: context.payload.issue.id
+                  pull_number: context.payload.issue.number
                 })
               } else {
                 console.log(`Unsupported deployment request to "${request ? request[1] : null}"`);
