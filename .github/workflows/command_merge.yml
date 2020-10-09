@@ -43,17 +43,18 @@ jobs:
 
               console.log(`Checking @${user} membership in project-leads team`);
               
-              const isMember = await github.teams.getMembershipForUserInOrg({
-                org: context.payload.organization.login,
-                team_slug: teamName,
-                username: user,
-              });
-
+              // A comment body to report back to the user if required
               let commentBody = null;
 
-              if (isMember.status === 404) {
-                const commentBody = `:red_circle: User @${user} is not privileged to run the command! Only members of ${teamName} can perform this operation.`;
-              } else {
+              try {
+                const isMember = await github.teams.getMembershipForUserInOrg({
+                  org: context.payload.organization.login,
+                  team_slug: teamName,
+                  username: user,
+                });  
+
+                console.log(`Is User an active team member? ${isMember.data.active}`);
+
                 console.log(`User is a member of the required team ${teamName}`);
                 try {
                   await github.pulls.merge({
@@ -63,8 +64,11 @@ jobs:
                 } catch (err) {
                   commentBody = `Well this is embarassing... Something went wrong performing merge: ${err.message}`;
                 }
+              } catch (err) {
+                console.log(err.status);
+                commentBody = `:red_circle: User @${user} is not privileged to run the command! Only members of ${teamName} can perform this operation.`;
               }
-
+              
               // Report back via a comment to the issue if we have something to relay to the issue/user
               if (commentBody) {
                 await github.issues.createComment({
