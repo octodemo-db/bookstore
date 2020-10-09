@@ -36,7 +36,12 @@ jobs:
 
             // Ensure request is valid
             if (request) {
-              console.log(`ack merge request!`);
+              // Acknowledge we have seen the comment
+              await github.reactions.createForIssueComment({
+                ...context.repo,
+                comment_id: context.payload.comment.id,
+                content: 'eyes'
+              });
 
               const user = context.payload.comment.user.login;
               const teamName = 'project-leads';
