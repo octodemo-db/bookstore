@@ -60,7 +60,11 @@ jobs:
                     pull_number: context.payload.issue.number
                   });
                 } catch (err) {
-                  commentBody = `Well this is embarassing... Something went wrong performing merge: ${err.message}`;
+                  commentBody = `
+                  Well this is embarassing... Something went wrong performing merge:
+
+                  __${err.message}__
+                  `;
                 }
               } catch (err) {
                 console.log(err.status);
