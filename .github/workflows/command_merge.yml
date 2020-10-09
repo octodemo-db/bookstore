@@ -47,7 +47,7 @@ jobs:
                   team_slug: 'project-leads',
                   username: user,
                 });
-                console.log(`Is Member: ${JSON.stringify(isMemeber, null, 2)}`);
+                console.log(`Is Member: ${JSON.stringify(isMember.data, null, 2)}`);
               } catch (err) {
                 console.log(JSON.stringify(err));
               }
