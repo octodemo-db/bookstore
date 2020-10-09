@@ -44,8 +44,8 @@ jobs:
               try {
                 const isMember = await github.teams.getMembershipForUserInOrg({
                   org: context.payload.organization.login,
-                  team_slug: 'project-leads'
-                  username: user
+                  team_slug: 'project-leads',
+                  username: user,
                 });
                 console.log(`Is Member: ${JSON.stringify(isMemeber, null, 2)}`);
               } catch (err) {
