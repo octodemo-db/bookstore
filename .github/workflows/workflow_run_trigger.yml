@@ -1,0 +1,19 @@
+name: Workflow Run Trigger
+
+on:
+  workflow_run:
+    workflows:
+      - "Build and Deploy [Production]"
+    types:
+      - completed
+      - requested
+    
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run
+        run: echo "Hello we got triggered"
