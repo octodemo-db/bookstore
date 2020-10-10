@@ -1,0 +1,16 @@
+{
+    "java.test.config": [
+        {
+            "name": "Container Database",
+            "env": {
+                "DATABASE_URL": "jdbc:postgresql://db:5432/bookstore",
+                "DATABASE_USER": "admin",
+                "DATABASE_PASSWORD": "password",
+            }
+        },
+        {
+            "name": "In:memory Database",
+            "env": {}
+        }
+    ]
+}

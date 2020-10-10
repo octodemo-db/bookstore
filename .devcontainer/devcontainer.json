@@ -46,7 +46,7 @@
     "java.server.launchMode": "Standard",
     "maven.pomfile.autoUpdateEffectivePOM": true,
     "telemetry.enableTelemetry": false,
-
     "extensions.ignoreRecommendations": true,
+    "java.test.message.hintForSetingDefaultConfig": false
   }
 }

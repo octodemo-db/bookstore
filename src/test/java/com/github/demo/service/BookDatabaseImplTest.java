@@ -20,13 +20,21 @@ public class BookDatabaseImplTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         booksDatabase.destroy();
     }
 
     @Test
-    public void testGetBooks() {
+    public void testGetAllBooks() {
         Collection<Book> books = booksDatabase.getAll();
         assertEquals("Books in database should match", BookUtils.getSampleBooks().size(), books.size());
+    }
+
+    @Test
+    public void testGetBooksByTitle() {
+        String title = "Crossing";
+
+        Collection<Book> matched = booksDatabase.getBooksByTitle(title);
+        assertEquals("Matched books count for tile ''" + title +"''", 1, matched.size());
     }
 }

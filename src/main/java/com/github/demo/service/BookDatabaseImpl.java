@@ -23,8 +23,6 @@ public class BookDatabaseImpl implements BookDatabase {
     }
 
     public BookDatabaseImpl(String url, String username, String password) {
-        Statement statement = null;
-
         try {
             Properties props = new Properties();
 
@@ -34,7 +32,6 @@ public class BookDatabaseImpl implements BookDatabase {
             if (password != null) {
                 props.setProperty("password", password);    
             }
-
             // This is a postgres specific setting, but SQLlite tolerates it
             props.setProperty("ssl", "false");
 
@@ -42,70 +39,13 @@ public class BookDatabaseImpl implements BookDatabase {
             if (url == null) {
                 url = "jdbc:sqlite::memory:";
             }
-
             connection = DriverManager.getConnection(url, props);
 
             if (url.indexOf(":memory:") > -1) {
-                // Initialize the database tables for in memory database
-                statement = connection.createStatement();
-
-                statement.execute("CREATE TABLE IF NOT EXISTS books (" 
-                    + "id INTEGER PRIMARY KEY, "
-                    + "title TEXT NOT NULL, "
-                    + "author TEXT, "
-                    + "image TEXT, "
-                    + "rating, INTEGER "
-                    + ")"
-                );
-                // Populate the database with some sample data
-                populate(BookUtils.getSampleBooks());
+                initializeAndPopulateDatabase();
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                // Ignore
-            }
-        }
-    }
-
-    @Override
-    public void populate(Collection<Book> books) {
-        if (books != null && books.size() > 0) {
-            PreparedStatement ps = null;
-
-            try {
-                ps = connection.prepareStatement("INSERT INTO books (title, author, image) VALUES(?, ?, ?)");
-
-                for (Book book : books) {
-                    //TODO
-                    System.out.println("Adding book to database: " + book.getTitle());
-
-                    ps.setString(1, book.getTitle());
-                    ps.setString(2, book.getAuthor());
-                    ps.setString(3, book.getCover());
-                    ps.execute();
-                }
-            } catch (SQLException e) {
-                //TODO
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (ps != null) {
-                        ps.close();
-                    }
-                } catch (SQLException e) {
-                    //TODO
-                    e.printStackTrace();
-                    // Do nothing
-                    ps = null;
-                }
-            }
-            System.out.println("Database populated");
         }
     }
 
@@ -141,7 +81,7 @@ public class BookDatabaseImpl implements BookDatabase {
 
         try {
             stmt = connection.createStatement();
-            String query = "SELECT * FROM books WHERE title='%" + name + "%'";
+            String query = "SELECT * FROM books WHERE title LIKE '%" + name + "%'";
 
             ResultSet results = stmt.executeQuery(query);
 
@@ -182,5 +122,62 @@ public class BookDatabaseImpl implements BookDatabase {
             // Ignore
             connection = null;
         }
+    }
+
+    @Override
+    public void populate(Collection<Book> books) throws SQLException {
+        if (books != null && books.size() > 0) {
+            PreparedStatement ps = null;
+
+            try {
+                ps = connection.prepareStatement("INSERT INTO books (title, author, image) VALUES(?, ?, ?)");
+
+                for (Book book : books) {
+                    System.out.println("Adding book to database: " + book.getTitle());
+                    ps.setString(1, book.getTitle());
+                    ps.setString(2, book.getAuthor());
+                    ps.setString(3, book.getCover());
+                    ps.execute();
+                }
+            } finally {
+                try {
+                    if (ps != null) {
+                        ps.close();
+                    }
+                } catch (SQLException e) {
+                    // Do nothing
+                    ps = null;
+                }
+            }
+            System.out.println("Database populated");
+        }
+    }
+
+    /**
+     * Initializes the internal database structure and populates it with our default data. 
+     */
+    private void initializeAndPopulateDatabase() throws SQLException {
+        Statement statement = null;
+        try {
+            // Initialize the database tables for in memory database
+            statement = connection.createStatement();
+
+            statement.execute("CREATE TABLE IF NOT EXISTS books (" 
+                + "id INTEGER PRIMARY KEY, "
+                + "title TEXT NOT NULL, "
+                + "author TEXT, "
+                + "image TEXT, "
+                + "rating, INTEGER "
+                + ")"
+            );
+            // Populate the database with some sample data
+            populate(BookUtils.getSampleBooks());
+        } catch (SQLException e) {
+            if (statement != null) {
+                statement.close();
+            }
+            throw e;
+        }
+        
     }
 }

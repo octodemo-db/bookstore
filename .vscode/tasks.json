@@ -32,13 +32,15 @@
                     "beginsPattern": "^.*Attaching agents:.*",
                     "endsPattern": "^.*Listening for transport dt_socket at address.*"
                 }
-            }]
+            }],
+            "promptOnClose": false
         },
         {
             "label": "jettyStop",
             "type": "shell",
             "command": "mvn -B jetty:stop -Pvscode-debug",
-            "isBackground": true
+            "isBackground": true,
+            "promptOnClose": false
         }
     ]
 }
