@@ -1,4 +1,4 @@
-name: Deploy to Cloud
+name: Deploy Environment - Cloud Run
 
 on:
   deployment

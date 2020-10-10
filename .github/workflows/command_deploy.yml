@@ -1,5 +1,10 @@
 name: Command - deploy
 
+#
+# An IssueOps Command. This command provides a "/deploy <env>" command that can be used from Issue comments
+# This is very similar to a Slack Slash command in intent.
+#
+
 on:
   issue_comment:
     types:
@@ -7,12 +12,11 @@ on:
       - edited
 
 jobs:
-
   command:
     name: Command
-
     runs-on: ubuntu-20.04
     
+    # Save some actions minutes, and only execute when necessary :-)
     if: startsWith(github.event.comment.body, '/deploy ')
 
     steps:
@@ -28,14 +32,13 @@ jobs:
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
-            console.log(JSON.stringify(context.payload, null, 2));
-            
             const comment = context.payload.comment.body;
-
             const request = /\/deploy (.*)/.exec(comment);
 
+            const ALLOWED_ENVIRONMENTS = ['qa', 'test'];
+
             // Ensure request is one of the allowed options
-            if (request && ['qa', 'test'].indexOf(request[1]) > -1) {
+            if (request && ALLOWED_ENVIRONMENTS.indexOf(request[1]) > -1) {
               console.log(`deploy request for environment "${request[1]}"`);
             
               await github.issues.addLabels({
@@ -44,5 +47,5 @@ jobs:
                 labels: [`Deploy to ${request[1]}`]
               });
             } else {
-              console.log(`Unsupported deployment request to "${request ? request[1] : null}"`);
+              console.log(`:red_circle:  Unsupported deployment request to environment "${request ? request[1] : null}"`);
             }

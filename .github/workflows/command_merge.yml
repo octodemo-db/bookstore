@@ -1,5 +1,10 @@
 name: Command - merge
 
+#
+# An IssueOps Command. This command provides a "/merge" command that can be used from Issue comments
+# This is very similar to a Slack Slash command in intent.
+#
+
 on:
   issue_comment:
     types:
@@ -7,12 +12,12 @@ on:
       - edited
 
 jobs:
-
   command:
     name: Command
 
     runs-on: ubuntu-20.04
 
+    # Save some actions minutes and only execute if we meet the necessary conditions.
     # This is only a valid request if we are on a pull request, gate for that by checking the pull_request information in the payload
     if: startsWith(github.event.comment.body, '/merge') && github.event.issue.pull_request != null 
 
@@ -29,14 +34,12 @@ jobs:
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
-            console.log(JSON.stringify(context.payload, null, 2));
-            
             const comment = context.payload.comment.body;
             const request = /^\/merge/.exec(comment);
 
             // Ensure request is valid
             if (request) {
-              // Acknowledge we have seen the comment
+              // Acknowledge we have seen the comment using the eyes reaction on the comment
               await github.reactions.createForIssueComment({
                 ...context.repo,
                 comment_id: context.payload.comment.id,
@@ -44,6 +47,7 @@ jobs:
               });
 
               const user = context.payload.comment.user.login;
+              // We only accept members of the specified team as having the necessary privileges to run this command.
               const teamName = 'project-leads';
 
               console.log(`Checking @${user} membership in project-leads team`);

@@ -1,5 +1,10 @@
 name: Cleanup PR Environments
 
+#
+# This workflow will remove any existing integration/review environments that have be created as part
+# of a Pull Request Review when the Pull Request is closed.
+#
+
 on:
   pull_request:
     types:
@@ -8,7 +13,7 @@ on:
 jobs:
   clean:
     name: Cleanup Review apps
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Get temporary token for invalidating deployment(s)
@@ -19,7 +24,7 @@ jobs:
           application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
           
       - name: Mark environments as inactive in GitHub
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |

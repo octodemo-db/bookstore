@@ -3,6 +3,14 @@ name: Container Image Scan
 on:
   registry_package:
 
+  # Trigger container scanning on completion of workflows that build a container
+  workflow_run:
+    workflows:
+      - build_branch.yml
+      - build_and_deploy.yml
+    types:
+      - completed
+
 jobs:
   container-scan:
     name: Container Image Scan
@@ -10,19 +18,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-        
-      - name: Display Context
-        uses: actions/github-script@v2
+        uses: actions/checkout@v2           
+
+      - name: Get Container Image from Commit Status
+        id: container_image
+        uses: actions/github-script@v3
         with:
           script: |
             console.log(JSON.stringify(context, null, 2));
 
-      - name: Get Container Image from Commit Status
-        id: container_image
-        uses: actions/github-script@v2
-        with:
-          script: |
             const status = await github.repos.getCombinedStatusForRef({
                 ...context.repo,
                 ref: context.sha
@@ -49,26 +53,24 @@ jobs:
                 containerStatus = status[status.length - 1];
             }
             
-            const containerParts = containerStatus.description.split(' ')
-                , containerRegistry = containerParts[1]
-                , containerImageTag = containerParts[0]
-            ;
+            const containerImageTag = containerStatus.description;
             core.setOutput('container_image_tag', containerImageTag);
-            core.setOutput('container_registry', containerRegistry);
             console.log(`Container Image: ${containerImageTag}`);
 
-      - name: Docker Pull Image
-        env:
-          REGISTRY_USERNAME: <token>
-          REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-          IMAGE: ${{ steps.container_image.outputs.container_image_tag }}
-          REGISTRY: ${{ steps.maven_build.outputs.container_registry }}
+
+      - name: Sign in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+      
+      - name: Fetch Container Image
         run: |
-          echo $REGISTRY_PASSWORD | docker login ${{ steps.container_image.outputs.container_registry }} -u $REGISTRY_USERNAME --password-stdin
           docker pull ${{ steps.container_image.outputs.container_image_tag }}
 
       - name: Scan Container Image
-        uses: anchore/scan-action@master
+        uses: anchore/scan-action@v1
         with:
           image-reference: ${{ steps.container_image.outputs.container_image_tag }}
           debug: true

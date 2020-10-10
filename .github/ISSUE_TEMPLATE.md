@@ -1,10 +1,9 @@
 ## User story
-As a ,
-I want 
-So that I can .
+As an <x>,
+I want to <y>
+So that I can <z>.
 
 ## Subtasks
 - [ ] Task 1
-- [ ] Task 2
 
 ## Notes

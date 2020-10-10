@@ -1,12 +1,16 @@
 name:  Branch - Build, Test and Publish
 
+#
+# This workflow provides a continuous integration workflow for all branches other than the default branch.
+#
+# Upon successful building of the container a commit status will be applied to provide a record of the container
+# that was published from this latest commit.
+#
+
 on:
   push:
     branches-ignore:
       - main
-
-# The name of the `Build (ubuntu 20.04, 1.8)` build is used as a required context inside the repository on protected
-#  branches configuration. Any changes to the OS or Java version will need to be reflected in repository settings.
 
 jobs:
   build:
@@ -44,7 +48,7 @@ jobs:
 
       - name: Define Build Parameters
         id: build_params
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         with:
           script: |
             const scriptPath = require('path').resolve('./.github/workflows/scripts/build_parameters.js')
@@ -92,4 +96,4 @@ jobs:
           authToken: ${{ secrets.GITHUB_TOKEN }}
           state: success
           context: Container Image Published
-          description: ${{ steps.maven_build.outputs.container_deployment_registry_tag }} ${{ steps.maven_build.outputs.container_registry }}
+          description: ${{ steps.maven_build.outputs.container_deployment_registry_tag }}

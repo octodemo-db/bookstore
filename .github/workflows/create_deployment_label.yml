@@ -1,4 +1,10 @@
 name: Create Deployment by label
+
+#
+# A workflow that will respond to particular labels being added to a Pull Request to create an
+# integration environment.
+#
+
 on:
   pull_request:
     types:
@@ -19,7 +25,7 @@ jobs:
 
       - name: Acknowledge Request Label from Pull Request
         id: acknowledge_label
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -28,7 +34,7 @@ jobs:
             await script({context, core, github});
             
       - name: Remove Label
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -46,9 +52,9 @@ jobs:
           application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
       
       - name: Create Deployment
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         env:
-          container_registry: ${{ steps.acknowledge_label.outputs.container_registry }}
+          container_registry: ghcr.io
           container_image_tag: ${{ steps.acknowledge_label.outputs.container_image_tag }}
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
@@ -64,7 +70,7 @@ jobs:
 
       - name: Report Failure
         if: failure()
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         with:
           script: |
             const commentBody = `Failure in _${context.payload.label.name.toLowerCase()}_, for more details see https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;

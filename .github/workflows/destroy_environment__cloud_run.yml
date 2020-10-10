@@ -1,4 +1,4 @@
-name: Remove Deployment Environment - Terraform
+name: Destroy Environment - Cloud Run
 
 on:
   deployment_status
@@ -21,7 +21,7 @@ jobs:
       TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT_ID }}
 
       # Directory that contains Terraform HCL to run
-      TERRAFORM_WORKING_DIRECTORY: ./terraform
+      TERRAFORM_WORKING_DIRECTORY: ./terraform/cloud_run
 
     steps:
       - name: Checkout Sources
