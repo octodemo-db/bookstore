@@ -150,7 +150,6 @@ public class BookDatabaseImpl implements BookDatabase {
                     results.getString("author"),
                     results.getString("title"),
                     results.getString("image")
-                    // results.getInt("rating")
                 );
 
                 books.add(book);

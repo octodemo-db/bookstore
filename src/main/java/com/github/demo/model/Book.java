@@ -12,15 +12,19 @@ public class Book {
     private String cover;
 
     public Book() {
-
+        this.title = "";
+        this.author = "";
+        this.cover = "";
     }
 
     public Book(String author, String title) {
+        this();
         this.author = author;
         this.title = title;
     }
 
     public Book(String author, String title, String cover) {
+        this();
         this.author = author;
         this.title = title;
         this.cover = cover;
