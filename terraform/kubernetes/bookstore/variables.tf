@@ -21,3 +21,25 @@ variable "database_port" {
   default = 5432
   type = number
 }
+
+variable "container_registry" {
+  type = string
+}
+
+variable "app_container" {
+  type = object({
+    image = string
+    version = string
+  })
+}
+
+variable "database_container" {
+  type = object({
+    image = string
+    version = string
+  })
+}
+
+locals {
+    db_name = "${var.app_name}-db"
+}

@@ -1,4 +1,4 @@
-name: Build and Deploy [Production]
+name: Build and Deploy - Production
 
 #
 # This workflow provides a continuous delivery workflow for the default branch on the repository.
@@ -52,8 +52,9 @@ jobs:
 
     # We need to share details across job boundaries, expose the step outs at the job level
     outputs:
-      container_image_tag: ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
-      container_registry_url: ${{ steps.maven_build.outputs.container_registry }}
+      container_registry: ${{ steps.maven_build.outputs.container_registry }}
+      container_image: ${{ steps.maven_build.outputs.container_image }}
+      container_version: ${{ steps.maven_build.outputs.container_version }}
 
     steps:
       - name: Checkout
@@ -99,7 +100,7 @@ jobs:
       - name: Publish Docker image
         id: container_publish
         run: |
-          docker push ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
+          docker push ${{ steps.maven_build.outputs.container_registry }}/${{ steps.maven_build.outputs.container_image }}:${{ steps.maven_build.outputs.container_version }}
 
       - name: Publish App Container as a Status
         id: container_image_status
@@ -107,8 +108,8 @@ jobs:
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
           state: success
-          context: Container Image Published - Application
-          description: ${{ steps.maven_build.outputs.container_deployment_registry_tag }}
+          context: Container Image Published - App
+          description: ${{ steps.maven_build.outputs.container_image }}:${{ steps.maven_build.outputs.container.version }}
       
 
   build_database:
@@ -120,8 +121,9 @@ jobs:
 
     # We need to share details across job boundaries, expose the step outs at the job level
     outputs:
-      container_image_tag: ${{ steps.container_details.outputs.container_registry_tag }}
-      container_registry_url: ghcr.io
+      container_image: ${{ steps.container_details.outputs.container_image }}
+      container_version: ${{ steps.container_details.outputs.container_version }}
+      container_registry: ghcr.io
 
     steps:
       - name: Checkout
@@ -130,6 +132,8 @@ jobs:
       - name: Container Details
         id: container_details
         run: |
+          echo "::set-output name=container_image::${{ needs.build_parameters.outputs.container_name }}_database"
+          echo "::set-output name=container_version::${{ needs.build_parameters.outputs.github_short_sha }}"
           echo "::set-output name=container_registry_tag::${{ needs.build_parameters.outputs.container_name }}_database:${{ needs.build_parameters.outputs.github_short_sha }}"
 
       - name: Build Container
@@ -164,6 +168,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     needs:
+      - build_parameters
       - build
       - build_database
 
@@ -179,32 +184,31 @@ jobs:
         id: create_deployment
         uses: actions/github-script@v3
         env:
-          container_registry_url: ${{ needs.build.outputs.container_registry_url }}
-          container_image: ${{ needs.build.outputs.container_image_tag }}
+          container_registry: ${{ needs.build.outputs.container_registry_url }}
 
+          app_container_image: ${{ needs.build.outputs.container_version }}
+          app_container_version: ${{ needs.build.outputs.container_version }}
+          
+          db_container_image: ${{ needs.build_database.outputs.container_image }}
+          db_container_version: ${{ needs.build_database.outputs.container_version }}
+          
+          sha: ${{ needs.build_parameters.outputs.github_short_sha }}
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
-            const environment = 'prod'
-              , isProduction = true
-              , deploymentPayload = {
-                  container_registry: process.env.container_registry_url,
-                  container_image: process.env.container_image,
-                  environment: environment,
-                  ref: context.ref,
-                }
-              ;
+            const scriptPath = require('path').resolve('./.github/workflows/scripts/create_deployment.js')
+              , createDeployment = require(scriptPath);
+            ;
 
-            await github.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.ref,
-              auto_merge: false,
-              required_contexts: [],
-              payload: JSON.stringify(deploymentPayload),
-              environment: environment,
-              description: `Deploy Pull Request to ${environment}`,
-              transient_environment: !isProduction,
-              production_environment: isProduction,
-              mediaType: { previews: ["flash-preview", "ant-man"] }
+            createDeployment({
+              context: context,
+              github: github,
+              environment: 'prod',
+              containerRegistry: process.env.container_registry,
+              appContainerImage: process.env.app_container_image,
+              appContainerVersion: process.env.app_container_version,
+              databaseContainerImage: process.env.db_container_image,
+              databaseContainerVersion: process.env.db_container_version,
+              sha: process.env.sha,
+              head: context.ref,
             });

@@ -358,9 +358,10 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>::set-output name=container_image_tag::${project.version}
+                                    <message>
                                         ::set-output name=container_registry::${container.image.registry}
-                                        ::set-output name=container_deployment_registry_tag::${container.image.name.full}:${project.version}
+                                        ::set-output name=container_image::${container.image.name.full}
+                                        ::set-output name=container_version::${project.version}
                                     </message>
                                 </configuration>
                             </execution>

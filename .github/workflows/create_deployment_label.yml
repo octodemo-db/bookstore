@@ -55,18 +55,37 @@ jobs:
         uses: actions/github-script@v3
         env:
           container_registry: ghcr.io
-          container_image_tag: ${{ steps.acknowledge_label.outputs.container_image_tag }}
+
+          app_container_image: ${{ steps.acknowledge_label.outputs.app_container_image }}
+          app_container_version: ${{ steps.acknowledge_label.outputs.app_container_version }}
+          
+          db_container_image: ${{ steps.acknowledge_label.outputs.database_container_image }}
+          db_container_version: ${{ steps.acknowledge_label.outputs.database_container_version }}
+          
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
-            const scriptPath = require('path').resolve('./.github/workflows/scripts/create_labeled_deployment.js');
-            const labelDeployment = require(scriptPath);
+            const scriptPath = require('path').resolve('./.github/workflows/scripts/create_deployment.js');
+            const createDeployment = require(scriptPath);
 
-            await labelDeployment(context,
-                                  github,
-                                  process.env.container_registry,
-                                  process.env.container_image_tag
-            );
+            const LABEL_TO_ENVIRONMENT = {
+              'Deploy to QA': 'qa',
+              'Deploy to Staging': 'staging',
+              'Deploy to Test': 'test'
+            };
+
+            await createDeployment({
+              context: context,
+              github: github,
+              environment: LABEL_TO_ENVIRONMENT[context.payload.label.name],
+              containerRegistry: process.env.container_registry,
+              appContainerImage: process.env.app_container_image,
+              appContainerVersion: process.env.app_container_version,
+              databaseContainerImage: process.env.db_container_image,
+              databaseContainerVersion: process.env.db_container_version,
+              sha: context.sha,
+              head: context.payload.pull_request.head.ref, //Branch name PR created from
+            });
 
       - name: Report Failure
         if: failure()

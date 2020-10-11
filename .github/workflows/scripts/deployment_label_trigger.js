@@ -9,13 +9,18 @@ module.exports = async ({context, core, github}) => {
     console.log('----- Context');
     console.log(JSON.stringify(context, null, 2));
 
-    const status = await github.repos.getCombinedStatusForRef({
+    const statuses = await github.repos.getCombinedStatusForRef({
         ...context.repo,
         ref: context.payload.pull_request.head.sha
     }).then(status => {
         if (status.data.statuses) {
+            const statusToMatch = [
+                'Container Image Published - App',
+                'Container Image Published - Database',
+            ]
+
             return status.data.statuses.filter(status => {
-                return status.context === 'Container Image Published'
+                return statusToMatch.indexOf(status.context) > -1;
             });
         }
         return null;
@@ -23,48 +28,63 @@ module.exports = async ({context, core, github}) => {
 
     //TODO remove this
     console.log('----- Combined Statuses');
-    console.log(JSON.stringify(status, null, 2));
+    console.log(JSON.stringify(statuses, null, 2));
 
-    if (!status || status.length === 0) {
+    if (!statuses || statuses.length === 0) {
         await postNoContainerStatus(context, github);
-    } else if (status.length === 1) {
-        await postDeploymentComment(context, core, github, label, status[0]);
+    } else if (statuses.length === 2) {
+        await postDeploymentComment(context, core, github, label, statuses);
     } else {
         // Assuming first the last is the latest, this should not happen in practice as this is for a single commit
-        await postDeploymentComment(context, core, github, label, status[status.length - 1]);
+        await postTooManyContainerStatus(context, github, statuses);
     }
 }
 
-async function postDeploymentComment(context, core, github, label, status) {
-    const containerParts = status.description.split(' ')
-        , containerRegistry = containerParts[1]
-        , containerImageTag = containerParts[0]
-        , environmentRegexResult = /deploy to (.*)/.exec(label)
+// Extract the necessary details from the statuses to be able to create a deployment
+async function postDeploymentComment(context, core, github, label, statuses) {
+    const environmentRegexResult = /deploy to (.*)/.exec(label)
+        , containers = []
     ;
 
-    core.setOutput('container_image_tag', containerImageTag);
-    core.setOutput('container_registry', containerRegistry);
+    statuses.forEach(status => {
+        const nameParts = status.context.split(' - ')
+            , containerType = nameParts[1].toLowerCase()
+            , containerParts = status.description.split(':')
+            , image = containerParts[0]
+            , version = containerParts[1]
+            ;
+        
+        containers.push(`* Container ${containerType}: _${image}_:__${version}__`);
+        core.setOutput(`${containerType}_container_image`, image);
+        core.setOutput(`${containerType}_container_version`, version);
+    });
 
     const commentBody = `
 👋 @${context.actor}, request for ${label} received.
 
 Starting Deployment:
-  * Container: _${containerParts[0]}_
-  * Environment: _${environmentRegexResult[1]}_
+${containers.join('\n')}
+* Environment: _${environmentRegexResult[1]}_
 `
     await github.issues.createComment({
+        ...context.repo,
         issue_number: context.issue.number,
-        owner: context.repo.owner,
-        repo: context.repo.repo,
         body: commentBody,
     });
 }
 
 async function postNoContainerStatus(context, github) {
     await github.issues.createComment({
+        ... context.repo,
         issue_number: context.issue.number,
-        owner: context.repo.owner,
-        repo: context.repo.repo,
         body: `⚠️ Failed to trigger environment deployment request as missing container status check on commit`,
+    });
+}
+
+async function postTooManyContainerStatus(context, github, statuses) {
+    await github.issues.createComment({
+        ... context.repo,
+        issue_number: context.issue.number,
+        body: `⚠️ Failed to trigger environment deployment request found too many statuses on the commit, expected two but got:\n${JSON.stringify(statuses)}`,
     });
 }

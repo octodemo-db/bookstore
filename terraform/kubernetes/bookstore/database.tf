@@ -1,8 +1,3 @@
-locals {
-    db_name = "${var.app_name}-db"
-}
-
-
 resource "kubernetes_persistent_volume_claim" "database_volume_claim" {
   metadata {
     name = "${local.db_name}-pv-claim"
@@ -71,8 +66,7 @@ resource "kubernetes_deployment" "database" {
       spec {
         container {
           name  = "bookstore-database"
-          # TODO
-          image = "ghcr.io/octodemo-db/bookstore_database:9b943bd3"
+          image = "${var.container_registry}/${var.database_container.image}:${var.database_container.version}"
           image_pull_policy = "IfNotPresent"        
 
           env {
@@ -120,7 +114,3 @@ resource "kubernetes_deployment" "database" {
     }
   }
 }
-
-# output port {
-#   value = kubernetes_service.app
-# }

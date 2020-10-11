@@ -48,13 +48,12 @@ resource "kubernetes_deployment" "app" {
       spec {
         container {
           name  = "bookstore"
-          image = "eu.gcr.io/octodemo-db-291120/octodemo-db-bookstore:1.0.0-peter-murray-patch-1-3264e6e7-SNAPSHOT"
+          image = "${var.container_registry}/${var.app_container.image}:${var.app_container.version}"
           image_pull_policy = "IfNotPresent"
 
           env {
             name  = "DATABASE_URL"
-            #TODO port from database service and name?
-            value = "jdbc:postgresql://bookstore-db:5432/${var.database_name}"
+            value = "jdbc:postgresql://${local.db_name}:${var.database_port}/${var.database_name}"
           }
 
           env {
@@ -77,25 +76,16 @@ resource "kubernetes_deployment" "app" {
             }
           }
 
-          # resources {
-          #   limits {
-          #     cpu    = "0.5"
-          #     memory = "512Mi"
-          #   }
-          #   requests {
-          #     cpu    = "250m"
-          #     memory = "50Mi"
-          #   }
-          # }
-
-          # liveness_probe {
-          #   http_get {
-          #     path = "/status"
-          #     port = 8080
-          #   }
-          #   initial_delay_seconds = 5
-          #   period_seconds        = 10
-          # }
+          resources {
+            limits {
+              cpu    = "0.5"
+              memory = "512Mi"
+            }
+            requests {
+              cpu    = "0.5"
+              memory = "250Mi"
+            }
+          }
         }
 
         restart_policy                   = "Always"
