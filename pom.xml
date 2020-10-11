@@ -371,7 +371,8 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>::set-output name=container_registry::${container.image.registry}
+                                    <message>Exporting Outputs for GitHub Actions
+                                        ::set-output name=container_registry::${container.image.registry}
                                         ::set-output name=container_image::${container.image.name}
                                         ::set-output name=container_version::${project.version}
                                     </message>
