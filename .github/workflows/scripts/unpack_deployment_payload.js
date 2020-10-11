@@ -15,8 +15,8 @@ class DeploymentPayload {
             , log_url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${run}`
             ;
 
-        const environment = deployment.environment
-            , deployment = context.payload.deployment
+        const deployment = context.payload.deployment
+            , environment = deployment.environment
             , deploymentPayload = JSON.parse(deployment.payload)
             ;
 
