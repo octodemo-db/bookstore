@@ -272,13 +272,26 @@
                         <artifactId>build-helper-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>clean container image name</id>
+                                <id>clean container image name full</id>
                                 <goals>
                                     <goal>regex-property</goal>
                                 </goals>
                                 <configuration>
                                     <name>container.image.name.full</name>
                                     <value>${container.image.registry}/${container.image.name}</value>
+                                    <regex>\?</regex>
+                                    <toLowerCase>true</toLowerCase>
+                                    <failIfNoMatch>false</failIfNoMatch>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>clean container image name</id>
+                                <goals>
+                                    <goal>regex-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>container.image.name</name>
+                                    <value>${container.image.name}</value>
                                     <regex>\?</regex>
                                     <toLowerCase>true</toLowerCase>
                                     <failIfNoMatch>false</failIfNoMatch>
@@ -360,7 +373,7 @@
                                 <configuration>
                                     <message>
                                         ::set-output name=container_registry::${container.image.registry}
-                                        ::set-output name=container_image::${container.image.name.full}
+                                        ::set-output name=container_image::${container.image.name}
                                         ::set-output name=container_version::${project.version}
                                     </message>
                                 </configuration>

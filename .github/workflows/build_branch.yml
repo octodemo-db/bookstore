@@ -106,7 +106,7 @@ jobs:
           password: ${{ secrets.OCTODEMOBOT_GHPR_TOKEN }}
           registry: ${{ steps.maven_build.outputs.container_registry }}
       
-      - name: Publish Docker image
+      - name: Publish Container image
         id: container_publish
         if: matrix.os == 'ubuntu-20.04'
         run: |
@@ -159,7 +159,7 @@ jobs:
           password: ${{ secrets.OCTODEMOBOT_GHPR_TOKEN }}
           registry: ghcr.io
       
-      - name: Publish Docker image
+      - name: Publish Container image
         id: container_publish
         run: |
           docker push ghcr.io/${{ steps.container_details.outputs.container_registry_tag }}
