@@ -34,7 +34,7 @@ public class BookTest {
     @Test
     public void testGetDetails() {
         String details = book.getDetails();
-        Assert.assertNotNull(book.getDetails());
+        Assert.assertNotNull(details);
     }
 
     @Before

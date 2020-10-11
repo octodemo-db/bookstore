@@ -47,7 +47,7 @@ public class BookServlet extends HttpServlet {
         Properties versionProperties = new Properties();
         versionProperties.load(getClass().getResourceAsStream("/version.properties"));
 
-        ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
+        ServletContextTemplateResolver resolver = new ServletContextTemplateResolver(req.getServletContext());
         resolver.setPrefix("/");
         resolver.setSuffix(".html");
 
