@@ -22,6 +22,9 @@ jobs:
       database_container_version: ${{ steps.deployment_data.outputs.database_container_version }}
       
     steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v2
+
       - name: Extract Deployment Details and Report Deployment in Progress
         id: deployment_data
         uses: actions/github-script@v2
