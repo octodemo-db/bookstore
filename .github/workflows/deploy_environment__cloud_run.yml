@@ -90,7 +90,7 @@ jobs:
       TF_VAR_ENVIRONMENT: ${{ github.event.deployment.environment }}
       TF_VAR_gcp_project: ${{ secrets.GCP_PROJECT_ID }}
       TF_VAR_container_image: ${{ needs.copy_container.outputs.gcp_container_name }}
-      TF_VAR_container_tag: ${{ needs.deploy_details.outputs.version }}
+      TF_VAR_container_tag: ${{ needs.deploy_details.outputs.container_version }}
 
       # Directory that contains Terraform HCL to run
       TERRAFORM_WORKING_DIRECTORY: ./terraform/cloud_run
