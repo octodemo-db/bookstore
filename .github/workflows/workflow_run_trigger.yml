@@ -4,6 +4,8 @@ on:
   workflow_run:
     workflows:
       - "Build and Deploy [Production]"
+    branches:
+      - main
     types:
       - completed
       - requested
