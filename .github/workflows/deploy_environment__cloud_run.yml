@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v2
-        
+
       - name: Extract Deployment Details and Report Deployment in Progress
         id: deployment_data
         uses: actions/github-script@v2
@@ -44,7 +44,7 @@ jobs:
       gcp_container_name: octodemo-db-bookstore
 
     env:
-      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/octodemo-db-bookstore:${{ needs.deploy_details.outputs.version }}
+      GCR_CONTAINER_IMAGE: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/octodemo-db-bookstore:${{ needs.deploy_details.outputs.container_version }}
 
     steps:
       - name: Sign in to GitHub Container Registry

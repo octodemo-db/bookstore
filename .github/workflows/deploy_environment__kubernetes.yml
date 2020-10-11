@@ -51,7 +51,7 @@ jobs:
       TF_VAR_ENVIRONMENT: ${{ github.event.deployment.environment }}
 
       TF_VAR_app_container: ${{ needs.deploy_details.outputs.app_container_image }}
-      TF_VAR_app_container_version: ${{ needs.deploy_details.app_container_version }}
+      TF_VAR_app_container_version: ${{ needs.deploy_details.outputs.app_container_version }}
       
       TF_VAR_database_container: ${{ needs.deploy_details.outputs.database_container_image }}
       TF_VAR_database_container_version: ${{ needs.deploy_details.outputs.database_container_version }}
