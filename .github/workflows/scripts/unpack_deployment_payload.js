@@ -8,7 +8,10 @@ class DeploymentPayload {
 
     // Unpacks the deployment payload and sets them as outputs then reports a deployment status
     async unpackAndStart() {
-        const run = process.env.GITHUB_RUN_ID
+        const context = this.context
+            , github = this.github
+            , core = this.core
+            , run = process.env.GITHUB_RUN_ID
             , log_url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${run}`
             ;
 
