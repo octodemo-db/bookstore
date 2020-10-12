@@ -74,6 +74,9 @@ jobs:
               'Deploy to Test': 'test'
             };
 
+            console.log('PAYLOAD');
+            console.log(JSON.stringify(context.payload));
+
             await createDeployment({
               context: context,
               github: github,
