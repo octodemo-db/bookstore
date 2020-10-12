@@ -82,7 +82,7 @@ resource "kubernetes_deployment" "app" {
               memory = "512Mi"
             }
             requests {
-              cpu    = "0.5"
+              cpu    = "0.25"
               memory = "250Mi"
             }
           }
