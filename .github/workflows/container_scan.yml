@@ -48,7 +48,7 @@ jobs:
 
             const containers = [];
             if (statuses) {
-                status.forEach(status => {
+                statuses.forEach(status => {
                   containers.push(status.description);
                 });
             }
