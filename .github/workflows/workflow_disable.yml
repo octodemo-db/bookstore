@@ -1,4 +1,4 @@
-name: Workflow - Enable
+name: Workflow - Disable
 
 on:
   workflow_dispatch:
@@ -9,13 +9,13 @@ on:
         description: The workflow file
 
 jobs:
-  enable_workflow:
-    name: Enable Workflow
+  disable_workflow:
+    name: Disable Workflow
 
     runs-on: ubuntu-latest
 
     steps:
-      - name: Enable workflow
+      - name: Disable workflow
         uses: actions/github-script@v3
         env:
           workflow_file: ${{ github.event.inputs.workflow_file }}
@@ -48,4 +48,4 @@ jobs:
             }
             
             const workflow = new WorkflowEnablement(process.env.workflow_file);
-            await workflow.enable();
+            await workflow.disable();
