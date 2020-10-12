@@ -50,7 +50,7 @@ module.exports = class DeploymentManager {
                                 ...context.repo,
                                 deployment_id: deployment.id,
                                 state: 'inactive',
-                                mediaType: { previews: ['flash'] }
+                                mediaType: { previews: ['flash', 'ant-man'] }
                             });
                         }
                     })
