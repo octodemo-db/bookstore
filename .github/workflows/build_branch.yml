@@ -1,4 +1,4 @@
-name:  Build, Test and Publish - Branch
+name:  Build Test and Publish - Branch
 
 #
 # This workflow provides a continuous integration workflow for all branches other than the default branch.
