@@ -54,7 +54,7 @@ async function postDeploymentComment(context, core, github, label, statuses) {
             , version = containerParts[1]
             ;
         
-        containers.push(`Container ${containerType}: _${image}_:__${version}__`);
+        containers.push(`| ${containerType} | _${image}_ | __${version}__ |`);
         core.setOutput(`${containerType}_container_image`, image);
         core.setOutput(`${containerType}_container_version`, version);
     });
@@ -62,9 +62,11 @@ async function postDeploymentComment(context, core, github, label, statuses) {
     const commentBody = `
 👋 Request for ${label} received...
 
-Starting Deployment of:
-* ${containers.join('\n')}
-* Environment: _${environmentRegexResult[1]}_
+Starting Deployment of __${environmentRegexResult[1]}__:
+|Container|Image Name|Version|
+|-|-|-|
+${containers.join('\n')}
+
 `
     await github.issues.createComment({
         ...context.repo,

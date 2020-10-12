@@ -5,7 +5,7 @@ module.exports = class DeploymentManager {
         this.github = github;
     }
 
-    async activateDeployment(deploymentId) {
+    async activateDeployment(deploymentId, environmentUrl) {
         const github = this.github
             , context = this.context
             ;
@@ -21,7 +21,9 @@ module.exports = class DeploymentManager {
         await github.repos.createDeploymentStatus({
             ...context.repo,
             deployment_id: deployment.id,
-            state: 'success'
+            state: 'success',
+            environment_url: environmentUrl,
+            mediaType: { previews: ['ant-man'] }
         });
 
         // Get all deployment for the specified environment

@@ -122,13 +122,15 @@ jobs:
         # env:
         #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: actions/github-script@v3
+        env:
+          environment_url: ${{ steps.terraform_output.outputs.stdout }}
         with:
           script: |
             const scriptPath = require('path').resolve('./.github/workflows/scripts/deploymentManager.js')
               , DeploymentManager = require(scriptPath);
             ;
             const manager = new DeploymentManager(context, github);
-            await manager.activateDeployment(context.payload.deployment.id);
+            await manager.activateDeployment(context.payload.deployment.id, process.env.environment_url);
 
       - name: Report Failure
         if: failure()
