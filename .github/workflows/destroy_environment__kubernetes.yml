@@ -1,4 +1,4 @@
-name: Destroy Environment - Cloud Run
+name: Destroy Environment - Kubernetes
 
 on:
   deployment_status
