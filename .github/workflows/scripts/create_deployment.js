@@ -46,7 +46,7 @@ module.exports = async (payload) => {
         description: `Deploy to ${environment}`,
         transient_environment: !isProduction,
         production_environment: isProduction,
-        mediaType: { previews: ["flash-preview", "ant-man"] }
+        mediaType: { previews: ["flash", "ant-man"] }
     });
 }
 
