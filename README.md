@@ -1,3 +1,4 @@
+[![Board Status](https://dev.azure.com/octoorg/f9fecbbc-d2ce-41aa-b745-de61141f55a7/8574cca6-9065-4912-bc64-e8d3797b02f5/_apis/work/boardbadge/43b17eff-7feb-4d15-96d7-063fcf3d49d3)](https://dev.azure.com/octoorg/f9fecbbc-d2ce-41aa-b745-de61141f55a7/_boards/board/t/8574cca6-9065-4912-bc64-e8d3797b02f5/Microsoft.RequirementCategory)
 # GitHub Demo Bookstore
 
 This is a simple Maven project that builds a WAR that contains a simple bookstore application. The application is able 
