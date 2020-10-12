@@ -21,7 +21,31 @@ jobs:
           workflow_file: ${{ github.event.inputs.workflow_file }}
         with:
           script: |
-            await github.request('PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/enable', {
-              ...context.repo
-              workflow_id: process.env.workflow_file
-            });
+            class WorkflowEnablement {
+              constructor(workflowFile) {
+                this.workflow = workflowFile;
+              }
+
+              enable() {
+                return github.request(
+                  'PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/enable',
+                  {
+                    ...context.repo,
+                    workflow_id: this.workflow
+                  }
+                );
+              }
+
+              disable() {
+                  return github.request(
+                  'PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/disable',
+                  {
+                    ...context.repo,
+                    workflow_id: this.workflow
+                  }
+                );
+              }
+            }
+            
+            const workflow = new WorkflowEnablement(process.env.workflow_file);
+            await workflow.enable();
