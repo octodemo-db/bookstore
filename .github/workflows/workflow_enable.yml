@@ -17,9 +17,11 @@ jobs:
     steps:
       - name: Enable workflow
         uses: actions/github-script@v3
+        env:
+          workflow_file: ${{ github.event.inputs.workflow_file }}
         with:
           script: |
             await github.request('PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/enable', {
               ...context.repo
-              workflow_id: ${{ github.event.inputs.workflow_file }}
+              workflow_id: process.env.workflow_file
             });
