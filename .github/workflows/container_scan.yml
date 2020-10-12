@@ -50,12 +50,12 @@ jobs:
             if (statuses) {
                 status.forEach(status => {
                   containers.push(status.description);
-                })
+                });
             }
             
             if (containers.length > 0) {
               core.setOutput('containers', JSON.stringify(containers));
-              console.log(`Containers found: ${JSON.stringify(containers))}`);
+              console.log(`Containers found: ${JSON.stringify(containers)}`);
             } else {
               core.setFailed(`No container images associated with commit`);
             }
