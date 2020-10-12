@@ -10,7 +10,7 @@ module.exports = class DeploymentManager {
             , context = this.context
             ;
 
-        const deployment = await github.repos.getDeloyment({
+        const deployment = await github.repos.getDeployment({
             ...context.repo,
             deployment_id: deploymentId
         }).then(resp => {
