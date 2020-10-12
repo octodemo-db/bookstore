@@ -36,7 +36,7 @@ jobs:
             }).then(status => {
                 if (status.data.statuses) {
                     return status.data.statuses.filter(status => {
-                        return status.context.startesWith('Container Image Published');
+                        return status.context.startsWith('Container Image Published');
                     });
                 }
                 return null;
