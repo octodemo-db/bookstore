@@ -44,7 +44,7 @@ jobs:
 
             //TODO remove this
             console.log('----- Combined Statuses');
-            console.log(JSON.stringify(status, null, 2));
+            console.log(JSON.stringify(statuses, null, 2));
 
             const containers = [];
             if (statuses) {
