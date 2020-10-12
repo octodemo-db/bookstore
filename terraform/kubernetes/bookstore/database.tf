@@ -56,6 +56,10 @@ resource "kubernetes_deployment" "database" {
       }
     }
 
+    strategy {
+      type = "Recreate"
+    }
+
     template {
       metadata {
         labels = {
