@@ -28,4 +28,3 @@ $ mvn package jetty:run
 ```
 
 
-
