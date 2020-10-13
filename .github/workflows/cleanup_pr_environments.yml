@@ -28,43 +28,13 @@ jobs:
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
-            console.log(context.payload.pull_request.head.ref)
+            const scriptPath = require('path').resolve('./.github/workflows/scripts/deploymentManager.js')
+              , DeploymentManager = require(scriptPath)
+              ;
 
-            github.repos.listDeployments(
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: context.payload.pull_request.head.ref
-              }
-            ).then(deployments => {
-              const promises = [];
+            const manager = new DeploymentManager(context, github);
+            const ref = context.payload.pull_request.head.ref;
 
-              deployments.data.forEach(deployment => {
-                promises.push(
-                  github.repos.listDeploymentStatuses({
-                    ...context.repo,
-                    deployment_id: deployment.id,
-                    per_page: 100,
-                  }).then(statuses => {
-                    if (statuses.data) {
-                      // The first state is the most current state for the deployment
-                      const currentState = statuses.data[0];
-                      if (currentState !== 'failure') {
-                        console.log(`Deployment: ${deployment.id}:${deployment.environment} transitioning to failure`);
-                        
-                        return github.repos.createDeploymentStatus({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          mediaType: {previews: ["flash", "ant-man"]},
-                          deployment_id: deployment.id,
-                          state: 'failure',
-                          description: 'Pull Request Merged/Closed, removing review environment'
-                        })
-                      }
-                    }
-                  })
-                );
-              });
-
-              return Promise.all(promises);
-            });
+            // This will transition the environments to failure to trigger clean up and then inactivate them due to limitation on the deployment 
+            // status support in Github Actions for 'inactive' status.
+            await manager.deactivateIntegrationDeployments(ref);

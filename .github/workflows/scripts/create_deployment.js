@@ -16,7 +16,9 @@ module.exports = async (payload) => {
         , head = validateParameter(payload, 'head')
     ;
 
-    const isProduction = environment === 'prod';
+    const isProduction = environment === 'prod'
+        , deploymentEnvironment = isProduction ? environment : `${environment}-${head}`
+    ;
 
     // A deployment payload for passing information of the components for the deployment
     const deploymentPayload = {
@@ -30,7 +32,7 @@ module.exports = async (payload) => {
             version: databaseContainerVersion,
         },
         sha: sha,
-        environment: environment,
+        environment: deploymentEnvironment,
         ref: context.ref,
     };
 
@@ -42,7 +44,7 @@ module.exports = async (payload) => {
         auto_merge: false,
         required_contexts: [],
         payload: JSON.stringify(deploymentPayload),
-        environment: environment,
+        environment: deploymentEnvironment,
         description: `Deploy to ${environment}`,
         transient_environment: !isProduction,
         production_environment: isProduction,
