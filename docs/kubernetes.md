@@ -2,6 +2,7 @@
 
 The bookstore can be deployed using Kubernetes which can be visualized as follows:
 
+![kubernetes bookstore](images/bookstore_kubernetes.png)
 
 
 The deployment of the complete bookstore is contstrained to a Kubernetes namespace which then consists of:
