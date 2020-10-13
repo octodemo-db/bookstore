@@ -17,13 +17,12 @@ module.exports = class DeploymentLabel {
       ;
 
     const label = context.payload.label.name.toLowerCase();
-    const statuses = await this.getContainerStatuses();
+    const containers = await this.getContainerStatuses();
 
-    if (!statuses || statuses.length === 0) {
+    if (!containers || containers.length === 0) {
       await this.postNoContainerStatus();
-    } else if (statuses.length === 2) {
+    } else if (containers.length === 2) {
       // Extract the containers, post a message to the user acknowledging the request and provide outputs for action steps
-      const containers = await this.postDeploymentComment(label, statuses);
       await this.postDeploymentComment(label, containers)
 
       // Expose the container details
@@ -39,13 +38,14 @@ module.exports = class DeploymentLabel {
         name: context.payload.label.name
       });
     } else {
-      await this.postTooManyContainerStatus(statuses);
+      await this.postTooManyContainerStatus(containers);
     }
   }
 
   async getContainerStatuses() {
     const context = this.context
       , github = this.github
+      , self = this;
       ;
 
     return github.repos.getCombinedStatusForRef({
@@ -63,7 +63,9 @@ module.exports = class DeploymentLabel {
         });
       }
       return null;
-    });
+    }).then(statuses => {
+      return self.getContainers(statuses);
+    })
   }
 
   async postNoContainerStatus() {
@@ -76,13 +78,13 @@ module.exports = class DeploymentLabel {
     });
   }
 
-  async postTooManyContainerStatus(statuses) {
+  async postTooManyContainerStatus(containers) {
     const context = this.context;
 
     await this.github.issues.createComment({
       ...context.repo,
       issue_number: context.issue.number,
-      body: `⚠️ Failed to trigger deployment request found too many statuses on the commit:\n\n${JSON.stringify(statuses)}`,
+      body: `⚠️ Failed to trigger deployment request found too many containers on the commit:\n\n${JSON.stringify(containers)}`,
     });
   }
 
