@@ -5,11 +5,11 @@ The bookstore consists of two parts, the web front end which runs from a Java Se
 
 ---
 * [Components](#components)
-  * [Web Application](#webapp)
+  * [Web Application](#web-app)
   * [Database](#database)
-* [Development](#development)
+* [Development Environment](#development-environment)
   * [Maven](#maven)
-  * [GitHub Actions](#githubactions)
+  * [GitHub Actions](#github-actions)
 
 ---
 
@@ -19,8 +19,7 @@ The bookstore consists of two parts, the web front end which runs from a Java Se
 The web app is a simple servlet that will obtain the books from the database and then render them for the user into HTML using Thymeleaf templates.
 The servlet is built into a WAR that can then be deployed to any web server that is capable of supporting servlets.
 
-<TODO EXAMPLE SCREENSHOT>
-
+![bookstore](images/bookstore.png)
 
 ### Database
 To make development and testing easier, if you do not provide the necessary environment varaibles for configuring an external database,
@@ -33,7 +32,7 @@ To specify an external database you will need to ensure that a JDBC driver is pr
 * `DATABASE_PASSWORD`: The database user password to connect to the database
 
 
-## Development
+## Development Environment
 
 To develop on this project you will need an environment that has the following tools and setup:
 
