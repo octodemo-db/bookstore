@@ -127,7 +127,7 @@ module.exports = class DeploymentLabel {
 Starting Deployment of __${environmentRegexResult[1]}__:
 |Container|Image Name|Version|
 |-|-|-|
-${containers.join('\n')}
+${containerTableEntries.join('\n')}
 `
     await github.issues.createComment({
       ...context.repo,
