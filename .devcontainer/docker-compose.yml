@@ -7,6 +7,15 @@ services:
     image: ghcr.io/octodemo-db/java-development-container:latest
     command: sleep infinity
     network_mode: service:db
+    
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        
+      - type: bind
+        source: /usr/bin/docker
+        target: /usr/bin/docker
 
   db:
     image: postgres:12
