@@ -10,12 +10,17 @@ import java.io.IOException;
 
 @WebServlet(
     name = "StatusServlet",
-    urlPatterns = {"/status"}
+    urlPatterns = {"/status"},
+    loadOnStartup = 1
 )
 @WebInitParam(name = "allowedTypes", value = "html")
 public class StatusServlet extends HttpServlet {
     
     private static final long serialVersionUID = 1L;
+
+    public StatusServlet() {
+        
+    }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

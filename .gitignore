@@ -12,6 +12,7 @@ scripts/.env
 .settings
 .classpath
 .project
+.factorypath
 
 # MacOS files
 .DS_Store

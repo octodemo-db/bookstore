@@ -2,6 +2,9 @@ package com.github.demo.servlet;
 
 import com.github.demo.model.Book;
 import com.github.demo.service.BookService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
@@ -19,16 +22,20 @@ import java.util.Properties;
 
 @WebServlet(
     name = "BookServlet",
-    urlPatterns = {""}
+    urlPatterns = {""},
+    loadOnStartup = 1
 )
 @WebInitParam(name = "allowedTypes", value = "html")
 public class BookServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    private static final Logger logger = LoggerFactory.getLogger(BookServlet.class);
+
     private BookService bookService;
 
     public BookServlet() {
+        logger.info("Starting Bookstore Servlet...");
         bookService = new BookService();
     }
 

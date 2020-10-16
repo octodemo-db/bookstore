@@ -17,7 +17,12 @@
 
         <java.version>11</java.version>
 
+        <!--
+            Dependency Versions
+        -->
         <jetty.version>9.4.31.v20200723</jetty.version>
+        <log4j.version>2.12.1</log4j.version>
+        <slf4j.version>2.0.0-alpha1</slf4j.version>
 
         <!--
             Properties used to create a CD style version number for the Maven build
@@ -25,6 +30,9 @@
         <revision>1.0.0</revision>
         <changelist></changelist>
         <sha1>-SNAPSHOT</sha1>
+
+        <!-- Logging debug flag for jetty server when we run the maven jetty plugin -->
+        <logj-debug>FALSE</logj-debug>
 
         <!--
             Properties for naming, tagging and deploying the Docker image, when running under the correct
@@ -66,6 +74,24 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.2.16</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j18-impl</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
@@ -207,9 +233,6 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
-                        <configuration>
-                            
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -217,37 +240,6 @@
     </build>
 
     <profiles>
-	     <profile>
-            <id>coverage-per-test</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <!-- Minimal supported version is 2.4 -->
-                        <version>2.13</version>
-                        <configuration>
-                            <properties>
-                                <property>
-                                    <name>listener</name>
-                                    <value>org.sonar.java.jacoco.JUnitListener</value>
-                                </property>
-                            </properties>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-            
-            <dependencies>
-                <dependency>
-                    <groupId>org.sonarsource.java</groupId>
-                    <artifactId>sonar-jacoco-listeners</artifactId>
-                    <version>3.8</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
         <!--
             Profile to build a Docker container for running our WAR.
             This will only activate on MacOS and Linux hosts as the container used as a base does not have a
@@ -284,6 +276,7 @@
                                     <failIfNoMatch>false</failIfNoMatch>
                                 </configuration>
                             </execution>
+
                             <execution>
                                 <id>clean container image name</id>
                                 <goals>
@@ -421,7 +414,7 @@
                         <groupId>org.eclipse.jetty</groupId>
                         <artifactId>jetty-maven-plugin</artifactId>
                         <configuration>
-                            <jvmArgs>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 --illegal-access=warn</jvmArgs>
+                            <jvmArgs>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 -Dlog4j2.debug=${log4j-debug}</jvmArgs>
                             <stopPort>8081</stopPort>
                             <stopKey>jetty-vscode</stopKey>
                             <env>
