@@ -421,6 +421,7 @@
                                 <DATABASE_URL>jdbc:postgresql://db:5432/bookstore</DATABASE_URL>
                                 <DATABASE_USER>admin</DATABASE_USER>
                                 <DATABASE_PASSWORD>password</DATABASE_PASSWORD>
+                                <DATABASE_RETRIES>1</DATABASE_RETRIES>
                             </env>
                         </configuration>
                     </plugin>

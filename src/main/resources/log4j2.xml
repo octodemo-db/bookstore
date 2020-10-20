@@ -7,11 +7,11 @@
   </Appenders>
 
   <Loggers>
-    <Root level="trace">
+    <Root level="INFO">
       <AppenderRef ref="Console"/>
     </Root>
 
-    <Logger name="com.github.demo.servlet.BookServlet" level="trace">
-    </Logger>
+    <Logger name="com.github.demo.servlet.BookServlet" level="DEBUG" />
+    <Logger name="com.github.demo.service" level="DEBUG" />
   </Loggers>
 </Configuration>

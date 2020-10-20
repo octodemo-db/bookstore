@@ -1,9 +1,9 @@
-# Docker Compose File for PostgreSQL Database Server
+# Docker Compose File for Application Container and PostgreSQL Database Server
 version: '3.2'
 
 services:
   app:
-    #image: maven:3.6.3-jdk-11    
+    #image: maven:3.6.3-jdk-11
     image: ghcr.io/octodemo-db/java-development-container:latest
     command: sleep infinity
     network_mode: service:db

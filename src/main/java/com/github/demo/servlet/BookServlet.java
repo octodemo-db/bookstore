@@ -2,6 +2,7 @@ package com.github.demo.servlet;
 
 import com.github.demo.model.Book;
 import com.github.demo.service.BookService;
+import com.github.demo.service.BookServiceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +35,14 @@ public class BookServlet extends HttpServlet {
 
     private BookService bookService;
 
-    public BookServlet() {
+    public BookServlet() throws Exception {
         logger.info("Starting Bookstore Servlet...");
-        bookService = new BookService();
+        try {
+            bookService = new BookService();
+        } catch (BookServiceException e) {
+            logger.error("Failed to instantiate BookService: " + e.getMessage());
+            throw e;
+        }
     }
 
     @Override
@@ -48,8 +54,6 @@ public class BookServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        List<Book> books = bookService.getBooks();
 
         Properties versionProperties = new Properties();
         versionProperties.load(getClass().getResourceAsStream("/version.properties"));
@@ -63,10 +67,18 @@ public class BookServlet extends HttpServlet {
 
         WebContext ctx = new WebContext(req, resp, getServletContext(), req.getLocale());
         ctx.setVariable("modified", Calendar.getInstance());
-        ctx.setVariable("books", books);
         ctx.setVariable("version", versionProperties.getProperty("version"));
 
-        resp.setHeader("Content-Type", "text/html; charset=UTF-8");
-        engine.process("books", ctx, resp.getWriter());
+        try {
+            List<Book> books = bookService.getBooks();
+            ctx.setVariable("books", books);                   
+            
+            resp.setHeader("Content-Type", "text/html; charset=UTF-8");
+            engine.process("books", ctx, resp.getWriter());           
+        } catch (BookServiceException e) {
+            ctx.setVariable("error", e.getMessage());
+            resp.setHeader("Content-Type", "text/html; charset=UTF-8");
+            engine.process("error", ctx, resp.getWriter());
+        }
     }
 }

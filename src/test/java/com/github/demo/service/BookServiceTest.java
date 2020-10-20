@@ -17,7 +17,7 @@ public class BookServiceTest {
     private BookService bookService;
 
     @Test
-    public void testGetBooks() {
+    public void testGetBooks() throws Exception {
         List<Book> books = bookService.getBooks();
         assertEquals("list length should be 6", 6, books.size());
     }

@@ -25,13 +25,13 @@ public class BookDatabaseImplTest {
     }
 
     @Test
-    public void testGetAllBooks() {
+    public void testGetAllBooks() throws Exception {
         Collection<Book> books = booksDatabase.getAll();
         assertEquals("Books in database should match", BookUtils.getSampleBooks().size(), books.size());
     }
 
     @Test
-    public void testGetBooksByTitle() {
+    public void testGetBooksByTitle() throws Exception {
         String title = "Crossing";
 
         Collection<Book> matched = booksDatabase.getBooksByTitle(title);

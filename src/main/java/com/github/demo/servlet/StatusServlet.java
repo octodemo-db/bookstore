@@ -18,6 +18,9 @@ public class StatusServlet extends HttpServlet {
     
     private static final long serialVersionUID = 1L;
 
+    // TODO as an improvement, make the database service shared and refer to the connection status of the database
+    // to help diagnose our application status.
+
     public StatusServlet() {
         
     }

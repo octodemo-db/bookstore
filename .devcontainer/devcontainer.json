@@ -2,9 +2,9 @@
   "dockerComposeFile": [
     "docker-compose.yml"
   ],
-  
+
   "service": "app",
-  
+
   "forwardPorts": [
     8080,
     5432
@@ -28,18 +28,16 @@
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash",
 
-    "sqltools.connections": [
-      {
-        "name": "Container database",
-        "driver": "PostgreSQL",
-        "previewLimit": 50,
-        "server": "localhost",
-        "port": 5432,
-        "database": "bookstore",
-        "username": "admin",
-        "askForPassword": true
-      }
-    ],
+    "sqltools.connections": [{
+      "name": "Container database",
+      "driver": "PostgreSQL",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "database": "bookstore",
+      "username": "admin",
+      "askForPassword": true
+    }],
 
     "java.project.importOnFirstTimeStartup": "automatic",
     "java.configuration.updateBuildConfiguration": "automatic",

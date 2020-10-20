@@ -76,6 +76,11 @@ resource "kubernetes_deployment" "app" {
             }
           }
 
+          env {
+            name = "DATABASE_RETRIES"
+            value = "2"
+          }
+
           resources {
             limits {
               cpu    = "0.5"
