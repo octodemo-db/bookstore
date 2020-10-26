@@ -46,4 +46,4 @@ jobs:
         uses: ./sharepoint-upload-action
         with:
           document_file: readme.docx
-          name: README-${{ github.run_id }}-${{ github.sha }}.docx
+          name: README-${{ github.run_number }}-${{ github.sha }}.docx
