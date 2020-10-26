@@ -1,0 +1,49 @@
+name: Publish Release Notes
+
+on:
+  workflow_dispatch:
+      
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get temporary access token
+        id: temp_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.OCTODEMOBOT_APPLICATION_ID_REPO_AUTOMATION }}
+          application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
+      
+      - name: Checkout Sources
+        uses: actions/checkout@v2
+
+      - name: Checkout Action
+        uses: actions/checkout@v2
+        with:
+          repository: octodemo-db/sharepoint-upload-action
+          ref: main
+          path: sharepoint-upload-action
+          token: ${{ steps.temp_token.outputs.token }}
+
+      - name: Install Pandoc
+        run: |
+          apt-get update
+          apt-get install pandoc
+
+      - name: Generate Word Document
+        run: |
+          pandoc -s README.md -o readme.docx
+
+      - name: Upload as Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: docs
+          path: readme.docx
+      
+      - name: Publish to Sharepoint
+        uses: ./sharepoint-upload-action
+        with:
+          document_file: readme.docx
+          name: README-${{ github.run_id }}-${{ github.sha }}
