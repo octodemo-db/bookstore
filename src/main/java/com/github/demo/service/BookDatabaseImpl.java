@@ -30,7 +30,6 @@ public class BookDatabaseImpl implements BookDatabase {
     /** The connection for the database. */
     private Connection connection;
 
-
     /**
      * Obtain the maximum number of database connection retires before giving up
      * @return The number of times to attempt to reconnect to the database.
@@ -77,7 +76,6 @@ public class BookDatabaseImpl implements BookDatabase {
         return connection != null;
     }
 
-
     @Override
     public List<Book> getAll() throws BookServiceException {
         List<Book> books = new ArrayList<Book>();
@@ -91,7 +89,11 @@ public class BookDatabaseImpl implements BookDatabase {
 
             ResultSet rs = stmt.executeQuery("SELECT * FROM books");
             while (rs.next()) {
-                Book book = new Book(rs.getString("author"), rs.getString("title"), rs.getString("image"));
+                Book book = new Book(
+                    rs.getString("author"), 
+                    rs.getString("title"), 
+                    rs.getString("image")
+                );
                 books.add(book);
             }
         } catch (SQLException e) {
@@ -118,9 +120,11 @@ public class BookDatabaseImpl implements BookDatabase {
             ResultSet results = stmt.executeQuery(query);
 
             while (results.next()) {
-                Book book = new Book(results.getString("author"), results.getString("title"),
-                        results.getString("image"));
-
+                Book book = new Book(
+                    results.getString("author"),
+                    results.getString("title"),
+                    results.getString("image")
+                );
                 books.add(book);
             }
         } catch (SQLException e) {
@@ -194,9 +198,14 @@ public class BookDatabaseImpl implements BookDatabase {
             // Initialize the database tables for in memory database
             statement = connection.createStatement();
 
-            statement.execute("CREATE TABLE IF NOT EXISTS books (" + "id INTEGER PRIMARY KEY, "
-                    + "title TEXT NOT NULL, " + "author TEXT, " + "image TEXT, " + "rating, INTEGER " + ")"
-                    );
+            statement.execute("CREATE TABLE IF NOT EXISTS books (" 
+                + "id INTEGER PRIMARY KEY, "
+                + "title TEXT NOT NULL, " 
+                + "author TEXT, " 
+                + "image TEXT, " 
+                + "rating, INTEGER " 
+                + ")"
+            );
             // Populate the database with some sample data
             populate(BookUtils.getSampleBooks());
         } catch (SQLException e) {
