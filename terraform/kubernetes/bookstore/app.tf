@@ -78,7 +78,7 @@ resource "kubernetes_deployment" "app" {
 
           env {
             name = "DATABASE_RETRIES"
-            value = "2"
+            value = "20"
           }
 
           resources {
