@@ -56,6 +56,8 @@ jobs:
       TF_VAR_database_container: ${{ needs.deploy_details.outputs.database_container_image }}
       TF_VAR_database_container_version: ${{ needs.deploy_details.outputs.database_container_version }}
 
+      KUBE_SYSTEM: gke
+
       GKE_CLUSTER: ${{ secrets.GKE_CLUSTER_NAME }}
       GKE_ZONE: ${{ secrets.GKE_CLUSTER_LOCATION }}
 
