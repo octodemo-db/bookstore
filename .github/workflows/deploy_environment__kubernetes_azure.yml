@@ -1,4 +1,4 @@
-name: Deploy Environment - Kubernetes
+name: Deploy Environment - Azure Kubernetes
 
 on:
   deployment

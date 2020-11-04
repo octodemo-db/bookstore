@@ -1,5 +1,5 @@
 
-name: Destroy Environment - Kubernetes
+name: Destroy Environment - Azure Kubernetes
 
 on:
   deployment_status
