@@ -8,6 +8,6 @@ remote_state {
 
     config = {
         bucket      = "octodemo-db-bookstore"
-        prefix      = "kube-${get_env("TF_VAR_ENVIRONMENT", "integration")}.terraform.state"
+        prefix      = "kube-azure-${get_env("TF_VAR_ENVIRONMENT", "integration")}.terraform.state"
     }
 }
