@@ -24,6 +24,8 @@ jobs:
       TF_VAR_database_container: placeholder
       TF_VAR_database_container_version: placeholder
 
+      KUBE_SYSTEM: gke
+
       GKE_CLUSTER: ${{ secrets.GKE_CLUSTER_NAME }}
       GKE_ZONE: ${{ secrets.GKE_CLUSTER_LOCATION }}      
 
