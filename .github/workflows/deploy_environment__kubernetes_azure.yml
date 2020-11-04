@@ -56,12 +56,7 @@ jobs:
       TF_VAR_database_container: ${{ needs.deploy_details.outputs.database_container_image }}
       TF_VAR_database_container_version: ${{ needs.deploy_details.outputs.database_container_version }}
 
-      AKS_CLUSTER: ${{ secrets.AKS_CLUSTER_NAME }}
-      AKS_RG: ${{ secrets.AZURE_RESOURCE_GROUP }}
-      AKS_CREDS: ${{ secrets.AKS_SVC_PRINCIPAL}}
-
-      GKE_CLUSTER: ${{ secrets.GKE_CLUSTER_NAME }}
-      GKE_ZONE: ${{ secrets.GKE_CLUSTER_LOCATION }}
+      KUBE_SYSTEM: azure
 
       # Directory that contains Terraform HCL to run
       TERRAFORM_WORKING_DIRECTORY: ./terraform/kubernetes
@@ -92,10 +87,10 @@ jobs:
       - name: Configure kubectl for Azure Kubernetes Services
         uses: Azure/aks-set-context@v1
         with:
-          creds: '${{ env.AKS_CREDS }}'
-          cluster-name: '${{ env.AKS_CLUSTER }}'
-          resource-group: '${{ env.AKS_RG }}'
-
+          creds: ${{ secrets.AKS_SVC_PRINCIPAL}}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+          resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          
       - name: Terraform - init
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
         run: terragrunt init
