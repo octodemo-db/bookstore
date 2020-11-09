@@ -118,15 +118,17 @@ module.exports = class DeploymentManager {
       ...context.repo, 
       deployment_id: deploymentId
     }).then(statuses => {
-      const currentStatus = statuses[0].state;
+      if (statuses && statuses.lenght > 0) {
+        const currentStatus = statuses[0].state;
 
-      if (currentStatus !== 'inactive') {
-        return github.repos.createDeploymentStatus({
-          ...context.repo,
-          deployment_id: deploymentId,
-          state: 'inactive',
-          mediaType: { previews: ['flash', 'ant-man'] }
-        });
+        if (currentStatus !== 'inactive') {
+          return github.repos.createDeploymentStatus({
+            ...context.repo,
+            deployment_id: deploymentId,
+            state: 'inactive',
+            mediaType: { previews: ['flash', 'ant-man'] }
+          });
+        }
       }
     });
   }
