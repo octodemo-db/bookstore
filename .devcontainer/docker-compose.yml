@@ -6,7 +6,10 @@ services:
     #image: maven:3.6.3-jdk-11
     image: ghcr.io/octodemo-db/java-development-container:latest
     command: sleep infinity
-    network_mode: service:db
+    #network_mode: service:db
+    networks:
+      - webapp_network
+      - hostnet
 
     volumes:
       - type: bind
@@ -42,3 +45,9 @@ services:
 
 volumes:
   postgres-data:
+
+networks:
+  webapp_network:
+  hostnet:
+    external: true
+    name: host
