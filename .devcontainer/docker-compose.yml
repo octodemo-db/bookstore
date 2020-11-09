@@ -1,5 +1,5 @@
 # Docker Compose File for Application Container and PostgreSQL Database Server
-version: '3.2'
+version: '3.8'
 
 services:
   app:
@@ -8,9 +8,6 @@ services:
     command: sleep infinity
     #network_mode: service:db
     network_mode: host
-#     networks:
-#       - webapp_network
-#       - hostnet
 
     volumes:
       - type: bind
@@ -22,8 +19,8 @@ services:
         target: /usr/bin/docker
         
       - type: bind
-        source: /usr/bin/docker-compose
-        target: /usr/bin/docker-compose
+        source: /usr/local/bin/docker-compose
+        target: /usr/local/bin/docker-compose
 
   db:
     image: postgres:12
@@ -52,8 +49,3 @@ services:
 
 volumes:
   postgres-data:
-
-# networks:
-#   webapp_network:
-#   hostnet:
-#     external: true
