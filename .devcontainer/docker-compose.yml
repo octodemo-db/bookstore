@@ -19,6 +19,10 @@ services:
       - type: bind
         source: /usr/bin/docker
         target: /usr/bin/docker
+        
+      - type: bind
+        source: /usr/bin/docker-compose
+        target: /usr/bin/docker-compose
 
   db:
     image: postgres:12
@@ -50,4 +54,3 @@ networks:
   webapp_network:
   hostnet:
     external: true
-    name: host
