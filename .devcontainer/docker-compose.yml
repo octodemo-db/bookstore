@@ -7,9 +7,10 @@ services:
     image: ghcr.io/octodemo-db/java-development-container:latest
     command: sleep infinity
     #network_mode: service:db
-    networks:
-      - webapp_network
-      - hostnet
+    network_mode: host
+#     networks:
+#       - webapp_network
+#       - hostnet
 
     volumes:
       - type: bind
@@ -27,6 +28,8 @@ services:
   db:
     image: postgres:12
     restart: unless-stopped
+
+    network_mode: host
 
     ports:
      - "5432:5432"
@@ -50,7 +53,7 @@ services:
 volumes:
   postgres-data:
 
-networks:
-  webapp_network:
-  hostnet:
-    external: true
+# networks:
+#   webapp_network:
+#   hostnet:
+#     external: true
