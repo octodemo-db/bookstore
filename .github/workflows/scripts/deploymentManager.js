@@ -118,7 +118,7 @@ module.exports = class DeploymentManager {
       ...context.repo, 
       deployment_id: deploymentId
     }).then(statuses => {
-      if (statuses && statuses.lenght > 0) {
+      if (statuses && statuses.length > 0) {
         const currentStatus = statuses[0].state;
 
         if (currentStatus !== 'inactive') {
