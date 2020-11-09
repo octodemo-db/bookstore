@@ -3,7 +3,7 @@
     {
       "name": "Container Database",
       "env": {
-        "DATABASE_URL": "jdbc:postgresql://db:5432/bookstore",
+        "DATABASE_URL": "jdbc:postgresql://localhost:5432/bookstore",
         "DATABASE_USER": "admin",
         "DATABASE_PASSWORD": "password",
       }
