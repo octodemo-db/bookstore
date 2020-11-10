@@ -60,6 +60,71 @@
         "showReuseMessage": false,
         "clear": false
       }
+    },
+    {
+      "label": "GCP: Authenticate",
+      "type": "shell",
+      "command": "/usr/share/google-cloud-sdk/bin/gcloud",
+      "args": ["auth", "login"],
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "GCP: gcloud containers get credentials",
+      "type": "shell",
+      "command": "/usr/share/google-cloud-sdk/bin/gcloud",
+      "args": [
+        "container",
+        "clusters",
+        "get-credentials",
+        "${input:KUBERNETES_CLUSTER_NAME}",
+        "--zone=${input:GCP_COMPUTE_ZONE}",
+        "--project=${input:GCP_PROJECT_ID}"
+      ],
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+  ],
+  "inputs": [
+    {
+      "id": "KUBERNETES_CLUSTER_NAME",
+      "type": "promptString",
+      "description": "The name of the Kubernetes Cluster in GCP Kubernetes Engine to connect to",
+      "default": "bookstore-test"
+    },
+    {
+      "id": "GCP_PROJECT_ID",
+      "type": "promptString",
+      "description": "The id for GCP project",
+      "default": "octodemo-db-291120"
+    },
+    {
+      "id": "GCP_COMPUTE_ZONE",
+      "type": "pickString",
+      "default": "europe-west2-a",
+      "description": "The GCP Compute zone for the resources",
+      "options": [
+        "europe-west2-a",
+        "europe-west2-b",
+        "europe-west2-c",
+        "europe-west1-a"
+      ]
     }
   ]
 }
