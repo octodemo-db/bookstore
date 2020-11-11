@@ -2,7 +2,7 @@ name: Publish Release Notes
 
 on:
   workflow_dispatch:
-      
+
 jobs:
   publish:
     name: Publish
@@ -15,7 +15,7 @@ jobs:
         with:
           application_id: ${{ secrets.OCTODEMOBOT_APPLICATION_ID_REPO_AUTOMATION }}
           application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
-      
+
       - name: Checkout Sources
         uses: actions/checkout@v2
 
@@ -41,9 +41,9 @@ jobs:
         with:
           name: docs
           path: readme.docx
-      
+
       - name: Publish to Sharepoint
         uses: ./sharepoint-upload-action
         with:
           document_file: readme.docx
-          name: README-${{ github.run_number }}-${{ github.sha }}.docx
+          name: Release_Notes-${{ github.run_number }}-${{ github.sha }}.docx
