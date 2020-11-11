@@ -75,7 +75,7 @@ jobs:
           terraform_wrapper: true
 
       - name: Setup Terragrunt
-        uses: peter-murray/terragrunt-gtihub-action@v1.0.0
+        uses: peter-murray/terragrunt-github-action@v1.0.0
         with:
           terragrunt_version: 0.26.2
 
