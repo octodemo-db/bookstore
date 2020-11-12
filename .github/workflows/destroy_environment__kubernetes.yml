@@ -27,7 +27,7 @@ jobs:
       KUBE_SYSTEM: gke
 
       GKE_CLUSTER: ${{ secrets.GKE_CLUSTER_NAME }}
-      GKE_ZONE: ${{ secrets.GKE_CLUSTER_LOCATION }}      
+      GKE_ZONE: ${{ secrets.GKE_CLUSTER_LOCATION }}
 
       # Directory that contains Terraform HCL to run
       TERRAFORM_WORKING_DIRECTORY: ./terraform/kubernetes
@@ -48,7 +48,7 @@ jobs:
           terragrunt_version: 0.25.2
 
       - name: Sign in to Google Cloud Platform
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@0.1.3
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           version: ${{ env.GCP_SDK_VERSION }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
@@ -66,7 +66,7 @@ jobs:
       - name: Terraform - destroy
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
         run: terragrunt destroy -auto-approve
-        
+
       - name: Remove Environment
         if: success()
         uses: actions/github-script@v2
@@ -74,7 +74,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             console.log(`Removing Deployment after Terraform destroy: ${context.payload.deployment.id}:${context.payload.deployment.environment}`);
-            
+
             await github.repos.deleteDeployment({
               ...context.repo,
               deployment_id: context.payload.deployment.id

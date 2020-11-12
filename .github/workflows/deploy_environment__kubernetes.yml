@@ -14,13 +14,13 @@ jobs:
 
     outputs:
       container_registry: ${{ steps.deployment_data.outputs.container_registry }}
-      
+
       app_container_image: ${{ steps.deployment_data.outputs.app_container_image }}
       app_container_version: ${{ steps.deployment_data.outputs.app_container_version }}
 
       database_container_image: ${{ steps.deployment_data.outputs.database_container_image }}
       database_container_version: ${{ steps.deployment_data.outputs.database_container_version }}
-      
+
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
               , deploymentPayload = require(scriptPath);
             ;
             await deploymentPayload(context, core, github).unpackAndStart();
-    
+
 
   deploy:
     name: Terraform Deploy
@@ -52,7 +52,7 @@ jobs:
 
       TF_VAR_app_container: ${{ needs.deploy_details.outputs.app_container_image }}
       TF_VAR_app_container_version: ${{ needs.deploy_details.outputs.app_container_version }}
-      
+
       TF_VAR_database_container: ${{ needs.deploy_details.outputs.database_container_image }}
       TF_VAR_database_container_version: ${{ needs.deploy_details.outputs.database_container_version }}
 
@@ -80,7 +80,7 @@ jobs:
           terragrunt_version: 0.26.2
 
       - name: Sign in to Google Cloud Platform
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@0.1.3
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           version: ${{ env.GCP_SDK_VERSION }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
@@ -121,7 +121,7 @@ jobs:
             const scriptPath = require('path').resolve('./.github/workflows/scripts/deploymentManager.js')
               , DeploymentManager = require(scriptPath)
               ;
-            
+
             const manager = new DeploymentManager(context, github);
             await manager.activateDeployment(context.payload.deployment.id, process.env.environment_url);
 
