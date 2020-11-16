@@ -68,11 +68,11 @@ jobs:
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v1.2.1
         with:
-          terraform_version: 0.13.4
+          terraform_version: 0.13.5
           terraform_wrapper: true
 
       - name: Setup Terragrunt
-        uses: autero1/action-terragrunt@v0.1.0
+        uses: peter-murray/terragrunt-github-action@v1.0.0
         with:
           terragrunt_version: 0.25.2
 
@@ -83,14 +83,14 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_TERRAFORM_SERVICE_ACCOUNT_KEY }}
           export_default_credentials: true
-          
+
       - name: Configure kubectl for Azure Kubernetes Services
         uses: Azure/aks-set-context@v1
         with:
           creds: ${{ secrets.AKS_SVC_PRINCIPAL}}
           cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
           resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          
+
       - name: Terraform - init
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
         run: terragrunt init

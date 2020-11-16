@@ -52,7 +52,7 @@ jobs:
       - name: Terraform - destroy
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
         run: terragrunt destroy -auto-approve
-        
+
       - name: Remove Environment
         if: success()
         uses: actions/github-script@v2
@@ -60,7 +60,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             console.log(`Removing Deployment after Terraform destroy: ${context.payload.deployment.id}:${context.payload.deployment.environment}`);
-            
+
             await github.repos.deleteDeployment({
               ...context.repo,
               deployment_id: context.payload.deployment.id
