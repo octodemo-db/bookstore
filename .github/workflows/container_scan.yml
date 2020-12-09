@@ -86,9 +86,9 @@ jobs:
           docker pull ghcr.io/${{ matrix.container }}
 
       - name: Scan Container Image
-        uses: anchore/scan-action@v1
+        uses: anchore/scan-action@v2
         with:
-          image-reference: ghcr.io/${{ matrix.container }}
+          image: ghcr.io/${{ matrix.container }}
           debug: true
           acs-report-enable: true
 
