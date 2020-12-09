@@ -203,6 +203,7 @@ public class BookDatabaseImpl implements BookDatabase {
                 + "title TEXT NOT NULL, "
                 + "author TEXT, "
                 + "image TEXT, "
+                + "rating INTEGER"
                 + ")"
             );
             // Populate the database with some sample data
