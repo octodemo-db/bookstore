@@ -90,10 +90,9 @@ public class BookDatabaseImpl implements BookDatabase {
             ResultSet rs = stmt.executeQuery("SELECT * FROM books");
             while (rs.next()) {
                 Book book = new Book(
-                    rs.getString("author"),
-                    rs.getString("title"),
-                    rs.getString("image"),
-                    rs.getInt("rating")
+                    rs.getString("author"), 
+                    rs.getString("title"), 
+                    rs.getString("image")
                 );
                 books.add(book);
             }
@@ -124,8 +123,7 @@ public class BookDatabaseImpl implements BookDatabase {
                 Book book = new Book(
                     results.getString("author"),
                     results.getString("title"),
-                    results.getString("image"),
-                    results.getInt("rating")
+                    results.getString("image")
                 );
                 books.add(book);
             }
@@ -164,14 +162,13 @@ public class BookDatabaseImpl implements BookDatabase {
             PreparedStatement ps = null;
 
             try {
-                ps = connection.prepareStatement("INSERT INTO books (title, author, image, rating) VALUES(?, ?, ?, ?)");
+                ps = connection.prepareStatement("INSERT INTO books (title, author, image) VALUES(?, ?, ?)");
 
                 for (Book book : books) {
                     System.out.println("Adding book to database: " + book.getTitle());
                     ps.setString(1, book.getTitle());
                     ps.setString(2, book.getAuthor());
                     ps.setString(3, book.getCover());
-                    ps.setInt(4, book.getRating());
                     ps.execute();
                 }
                 logger.info("Database populated.");
@@ -201,12 +198,12 @@ public class BookDatabaseImpl implements BookDatabase {
             // Initialize the database tables for in memory database
             statement = connection.createStatement();
 
-            statement.execute("CREATE TABLE IF NOT EXISTS books ("
+            statement.execute("CREATE TABLE IF NOT EXISTS books (" 
                 + "id INTEGER PRIMARY KEY, "
-                + "title TEXT NOT NULL, "
-                + "author TEXT, "
-                + "image TEXT, "
-                + "rating, INTEGER "
+                + "title TEXT NOT NULL, " 
+                + "author TEXT, " 
+                + "image TEXT, " 
+                + "rating, INTEGER " 
                 + ")"
             );
             // Populate the database with some sample data
@@ -238,7 +235,7 @@ public class BookDatabaseImpl implements BookDatabase {
 
                 logger.warn("Failed to connect to database, reties: " + retryCount);
                 logger.warn(e.getMessage());
-
+                
                 try {
                     logger.info("Backing off before retrying database connection for " + RETRY_BACKOFF + "ms.");
                     Thread.sleep(RETRY_BACKOFF);
